@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Puntos de Riesgo</string>
+    <string name="item_Clima">Clima</string>
+    <string name="item_Añadir">Añadir</string>
+    <string name="item_Usuario">Usuario</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+</resources>
