@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/clima"
+        android:id="@+id/informacion"
         android:title="@string/item_Clima"
         android:icon="@drawable/cloud_sun_solid"/>
     <item
         android:id="@+id/añadir"
-        android:title="@string/item_Añadir"
-        android:icon="@drawable/plus_solid"/>
+        android:icon="@drawable/map_location_dot_solid"
+        android:title="@string/item_Mapa" />
     <item
         android:id="@+id/usuario"
         android:title="@string/item_Usuario"
