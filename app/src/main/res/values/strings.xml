@@ -6,4 +6,18 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <string name="txtEmail">Correo Electrónico</string>
+    <string name="txtPass">Contraseña</string>
+    <string name="txtConfPass">Confirmar Contraseña</string>
+    <string name="hintEmail">example@gmail.com</string>
+    <string name="hintPass">Introducir Contraseña</string>
+
+    <string name="lblAcceder">¡Accede Ya!</string>
+    <string name="lblRegistro">¡Regístrate!</string>
+    <string name="btnAcceder">Acceder</string>
+    <string name="btnRegistrar">Registrar</string>
+    <string name="olvidarPass">¿Olvidaste tu Contraseña?</string>
+    <string name="txtRegistro">¿No tienes una cuenta? Regístrate</string>
+    <string name="txtLogin">¿Ya tienes una cuenta? Accede Ya</string>
+
 </resources>

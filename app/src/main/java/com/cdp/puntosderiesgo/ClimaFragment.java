@@ -89,6 +89,18 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
                     public void onSuccess(Location location) {
                         //Obtener latitud y longitud de la ubicación
                         LatLng primeraUbicacion = new LatLng(location.getLatitude(), location.getLongitude());
+
+                        //Obtenemos por separado la longitud y latitud
+                        double latubicacion=location.getLatitude();
+                        double lngubicacion=location.getLongitude();
+                        //creamos un bundle para pasar los datos
+                        Bundle result = new Bundle();
+                        //Añadimos la longitud y latitud al bundle
+                        result.putDouble("latitud", latubicacion);
+                        result.putDouble("longitud", lngubicacion);
+                        //pasamos el bundle
+                        getParentFragmentManager().setFragmentResult("requestKey", result);
+
                         //Movemos la cámara a la ubicación
                         googleMap.moveCamera(CameraUpdateFactory.newLatLng(primeraUbicacion));
                         //Crear el área circular al rededor de la última ubicación

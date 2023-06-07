@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "487010300693",
+    "project_id": "harkay-puntos-de-riesgo",
+    "storage_bucket": "harkay-puntos-de-riesgo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:487010300693:android:a3b4db72b8f3d9384f2f1c",
+        "android_client_info": {
+          "package_name": "com.cdp.puntosderiesgo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "487010300693-qdosdtsb4ip4a5723is0tr30le58f8fm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAyuv58RDHjPPBJ1Tr4hdyLSWgye32br8I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "487010300693-qdosdtsb4ip4a5723is0tr30le58f8fm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
