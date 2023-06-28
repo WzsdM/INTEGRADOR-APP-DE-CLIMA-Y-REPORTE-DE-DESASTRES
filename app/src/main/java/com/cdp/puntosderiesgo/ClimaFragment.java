@@ -1,9 +1,11 @@
 package com.cdp.puntosderiesgo;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +15,12 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -23,6 +31,9 @@ import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class ClimaFragment extends Fragment implements OnMapReadyCallback {
 
@@ -108,7 +119,36 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
                                 .center(primeraUbicacion)
                                 .radius(500)
                                 .strokeColor(Color.TRANSPARENT)
-                                .fillColor(0x50ffd500));
+                                .fillColor(0x50ffd500)
+                                .clickable(true));
+
+                        googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+                            //Creamos un detector del mapa del circulo
+                            @Override
+                            public void onMapClick(@NonNull LatLng latLng) {
+                                if(circle.isClickable()){
+                                    googleMap.setOnCircleClickListener(new GoogleMap.OnCircleClickListener() {
+                                        //Creamos un detector del click del circulo
+                                        @Override
+                                        public void onCircleClick(@NonNull Circle circle) {
+                                            //Obtenemos la lat, y long del click
+                                            double latitude= latLng.latitude;
+                                            double longitude= latLng.longitude;
+
+                                            String[] ciudadPais=getCiudadPais(latitude,longitude);
+
+                                            //Creamos el enlace para pasar de este fragmento a la actividad de crear publicaciones
+                                            Intent ns=new Intent(getView().getContext(),CrearPostActivity.class);
+                                            ns.putExtra("latitude", latitude);
+                                            ns.putExtra("longitude", longitude);
+                                            ns.putExtra("ciudad", ciudadPais[0]);
+                                            ns.putExtra("pais", ciudadPais[1]);
+                                            startActivity(ns);
+                                        }
+                                    });
+                                }
+                            }
+                        });
 
                     }
                 });
@@ -119,4 +159,49 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
 
     }
+
+    private String[] getCiudadPais(double latubicacion, double lngubicacion){
+        String latString= String.valueOf(latubicacion);
+        String lngString= String.valueOf(lngubicacion);
+        final String[] ciudad = new String[2];
+        //url de la API call
+        String url =
+                "https://api.openweathermap.org/data/2.5/weather?lat="+latString+"&lon="
+                        +lngString+"&appid=adbcbb553555fc3bfebec807e947eb27&units=metric&lang=es";
+
+        //Request del método GET(lectura de datos)
+        StringRequest postRequest=new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            //Capturamos la respuesta del GET en variables
+            public void onResponse(String response) {
+                //Conversión de json a objeto para extraer los datos
+                try {
+
+                    JSONObject jsonObject= new JSONObject(response);
+                    JSONObject jsonObjectSys=jsonObject.getJSONObject("sys");
+
+                    String cityName=jsonObject.getString("name");//Ciudad
+                    String countryName=jsonObjectSys.getString("country");//Pais
+                    ciudad[0] =cityName;
+                    ciudad[1] =countryName;
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //enviar error si en caso hubiera
+                Log.e("error",error.getMessage());
+                ciudad[0] ="";
+                ciudad[1]="";
+            }
+        });
+
+        //enviar la petición
+        RequestQueue requestQueue = Volley.newRequestQueue(getView().getContext());
+        requestQueue.add(postRequest);
+        return ciudad;
+    }
+
 }

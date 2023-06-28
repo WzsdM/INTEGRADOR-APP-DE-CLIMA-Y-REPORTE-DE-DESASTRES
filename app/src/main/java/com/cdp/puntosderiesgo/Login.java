@@ -58,9 +58,21 @@ public class Login extends AppCompatActivity {
     }
 
     @Override
-    protected void onStart() {
+    protected void onStart(){
         super.onStart();
-        FirebaseUser currentUser= mAuth.getCurrentUser();
+        mAuth.addAuthStateListener(new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser currentUser= mAuth.getCurrentUser();
+                if (currentUser != null) {
+                    Log.w("TAG", "onAuthStateChanged - Logueado");
+                    Intent ns=new Intent(Login.this, MainActivity.class);
+                    startActivity(ns);
+                } else {
+                    Log.w("TAG", "onAuthStateChanged - Cerro sesion");
+                }
+            }
+        });
     }
 
     public void doCargar(View view){

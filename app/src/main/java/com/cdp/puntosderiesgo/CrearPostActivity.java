@@ -1,0 +1,213 @@
+package com.cdp.puntosderiesgo;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Spinner;
+import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.cdp.puntosderiesgo.clases.Categoria;
+import com.cdp.puntosderiesgo.clases.Post;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
+
+public class CrearPostActivity extends AppCompatActivity {
+
+    EditText v_title,v_descripcion;
+    Spinner v_categoria;
+    Button v_btn_imagen, v_anadir;
+    ImageView v_suibr_imagen;
+    private static final int File=1;
+    DatabaseReference myRef,spinnerRef;
+    StorageReference storageReference;
+    FirebaseAuth mAuth;
+    String storage_path_post="Post/*";
+    private static final int COD_SEL_IMAGE=300;
+
+    private Uri image_url;
+    String photo="photo";
+    ProgressDialog progressDialog;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_crear_post);
+        v_suibr_imagen=findViewById((R.id.imagen));
+        v_anadir=findViewById(R.id.btn_anadir);
+        v_btn_imagen=findViewById(R.id.btn_imagen);
+        v_title=findViewById(R.id.txtTitle);
+        v_descripcion=findViewById(R.id.txtPRDescription);
+        v_categoria=findViewById(R.id.spinner);
+        mAuth=FirebaseAuth.getInstance();
+        spinnerRef=FirebaseDatabase.getInstance().getReference().child("App");
+        FirebaseDatabase database= FirebaseDatabase.getInstance();
+        myRef= database.getReference("Usuarios").child(mAuth.getCurrentUser()
+                .getUid()).child("publicaciones").child(idGenerator());
+        progressDialog= new ProgressDialog(this);
+        storageReference=FirebaseStorage.getInstance().getReference();
+
+
+        cargarCategorias();
+        double latitude = getIntent().getDoubleExtra("latitude",0);
+        double longitude = getIntent().getDoubleExtra("longitude",0);
+        String pais=getIntent().getStringExtra("pais");
+        String ciudad=getIntent().getStringExtra("ciudad");
+
+        v_btn_imagen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cargarFoto();
+            }
+        });
+        v_anadir.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                crearPost(myRef.getKey(),ciudad,pais,latitude,longitude);
+            }
+        });
+    }
+    private void cargarCategorias(){
+
+        ArrayList<Categoria> categorias=new ArrayList<>();
+        spinnerRef.child("Categorias").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    categorias.clear();
+                    for (DataSnapshot ds:snapshot.getChildren()){
+                        String nombre=ds.child("nombre").getValue().toString();
+                        categorias.add(new Categoria(nombre));
+                    }
+                    ArrayAdapter<Categoria> adapter;
+                    adapter= new ArrayAdapter<>(CrearPostActivity.this, android.R.layout.simple_spinner_dropdown_item,categorias);
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    v_categoria.setAdapter(adapter);
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                throw error.toException();
+            }
+        });
+    }
+    private void cargarFoto() {
+        Intent i= new Intent(Intent.ACTION_PICK);
+        i.setType("image/*");
+        startActivityForResult(i,COD_SEL_IMAGE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if(resultCode==RESULT_OK){
+            if(requestCode==COD_SEL_IMAGE){
+                image_url=data.getData();
+                subirPhoto(image_url);
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+    private void subirPhoto(Uri image_url){
+
+        progressDialog.setMessage("Actualizando Imagen");
+        progressDialog.show();
+        String rute_storage_photo=storage_path_post+""+photo+""+mAuth.getUid()+""+idGenerator();//Es una id diferente
+        StorageReference reference=storageReference.child(rute_storage_photo);
+        reference.putFile(image_url).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Task<Uri>uriTask=taskSnapshot.getStorage().getDownloadUrl();
+                while (!uriTask.isSuccessful());
+                if(uriTask.isSuccessful()){
+                    uriTask.addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            String download_uri=uri.toString();
+                            HashMap<String,Object> map=new HashMap<>();
+                            map.put("photo",download_uri);
+                            myRef.updateChildren(map);
+                            progressDialog.dismiss();
+                            Toast.makeText(CrearPostActivity.this,"Foto Actualizada",Toast.LENGTH_SHORT);
+                        }
+                    });
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d("TAG","Error al subir Foto", e);
+                progressDialog.dismiss();
+                Toast.makeText(CrearPostActivity.this,"Error al subir Foto",Toast.LENGTH_SHORT);
+            }
+        });
+
+    }
+    private void crearPost(String id,String ciudad, String pais, Double latitude, Double longitude) {
+        String title = v_title.getText().toString();
+        String detalle=v_descripcion.getText().toString();
+        String categoria = v_categoria.getSelectedItem().toString();
+
+        HashMap<String,Object> map=new HashMap<>();
+        map.put("id",id);
+        map.put("ciudad",ciudad);
+        map.put("pais",pais);
+        map.put("latitude",latitude.toString());
+        map.put("longitude",longitude.toString());
+        map.put("title",title);
+        map.put("detalle",detalle);
+        map.put("categoria",categoria);
+        myRef.updateChildren(map);
+        Intent ns=new Intent(CrearPostActivity.this,MainActivity.class);
+        startActivity(ns);
+    }
+
+    public String idGenerator(){
+        Random rnd = new Random();
+        String num ="";
+
+        for (int i = 0; i < 16; i++) {
+            if (i < 8) { //Obtiene los primeros 8 numeros.
+                num += rnd.nextInt(8);
+            } else {
+                //Obtiene caracter aleatorio entre 65 y 90 ("A" y "Z").
+                num += String.valueOf((char) (rnd.nextInt(90-65) + 65));
+            }
+        }
+        return num;
+    }
+}

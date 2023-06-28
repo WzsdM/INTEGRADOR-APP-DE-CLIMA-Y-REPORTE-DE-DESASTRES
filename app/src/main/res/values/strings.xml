@@ -20,4 +20,13 @@
     <string name="txtRegistro">¿No tienes una cuenta? Regístrate</string>
     <string name="txtLogin">¿Ya tienes una cuenta? Accede Ya</string>
 
+    <string name="title_crear_post">Crea un Punto de Riesgo</string>
+    <string name="lbl_title">Título</string>
+    <string name="lbl_categoria">Categoria</string>
+    <string name="lbl_detalle">Descripción</string>
+    <string name="btn_up_image">Subir Imagen</string>
+    <string name="btn_crear_post">Añadir</string>
+    <string name="txt_file_success">Punto Añadido</string>
+    <string name="msg_upload_image">Actualizando Foto</string>
+
 </resources>

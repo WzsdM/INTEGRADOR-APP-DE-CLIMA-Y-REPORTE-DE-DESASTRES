@@ -1,17 +1,18 @@
 package com.cdp.puntosderiesgo;
 
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentResultListener;
-
+import android.text.SpannableString;
+import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
+import android.webkit.WebView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentResultListener;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -24,13 +25,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.DecimalFormat;
-
 public class InformacionFragment extends Fragment {
 
-    TextView v_result;
-    String output;
-    DecimalFormat df= new DecimalFormat("#.##");
+    TextView v_lugar;
+    TextView v_nubes;
+    TextView v_clima;
+    TextView v_description;
+    TextView v_temp;
+    TextView v_prec;
+    TextView v_humedad;
+    TextView v_sens;
+    WebView img;
 
     public InformacionFragment() {
         // Required empty public constructor
@@ -49,8 +54,16 @@ public class InformacionFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_clima, container, false);
 
-        v_result=view.findViewById(R.id.txtResult);
-                getParentFragmentManager().setFragmentResultListener("requestKey", this, new FragmentResultListener() {
+        v_lugar=view.findViewById(R.id.txtLugar);
+        v_temp=view.findViewById(R.id.txtTemp);
+        v_clima=view.findViewById(R.id.txtClima);
+        v_description=view.findViewById(R.id.txtDescription);
+        v_prec=view.findViewById(R.id.txtPrec);
+        v_humedad=view.findViewById(R.id.txtHumedad);
+        v_sens=view.findViewById(R.id.txtSenT);
+        v_nubes=view.findViewById(R.id.txtNubes);
+        img=view.findViewById(R.id.img);
+        getParentFragmentManager().setFragmentResultListener("requestKey", this, new FragmentResultListener() {
             @Override
             public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
                 double latubicacion = result.getDouble("latitud");
@@ -106,18 +119,20 @@ public class InformacionFragment extends Fragment {
 
                     double wind=jsonObjectWind.getDouble("speed");//Velocidad del viento
 
-                    output="Clima actual de "+cityName+"("+countryName+")"
-                    +"\n Estado : "+clima
-                    +"\n Descripción : "+description
-                    +"\n Temperatura : "+temp
-                    +"\n Temperatura Sentida : "+temp_like
-                    +"\n Presión : "+pressure
-                    +"\n Humedad : "+humidity
-                    +"\n Nubes : "+clouds
-                    +"\n Velocidad del Viento : "+wind;
+                    String temperatura=temp+" °C";
+                    SpannableString ss1=  new SpannableString(temperatura);
+                    ss1.setSpan(new RelativeSizeSpan(0.4f), 3,8, 0); // set size
 
-                    v_result.setText("");
-                    v_result.setText(output);
+                    v_lugar.setText(cityName+"("+countryName+")");
+                    v_temp.setText(ss1);
+                    v_clima.setText(clima);
+                    v_description.setText(description);
+                    v_prec.setText("Precipitación : "+pressure+" PA");
+                    v_humedad.setText("Humedad : "+humidity+"g/m3");
+                    v_sens.setText("Sensación Térmica: "+temp_like+" °C");
+                    v_nubes.setText("Nubes : "+clouds+", Viento : "+wind+"km/h");
+
+
 
                 } catch (JSONException e) {
                     throw new RuntimeException(e);

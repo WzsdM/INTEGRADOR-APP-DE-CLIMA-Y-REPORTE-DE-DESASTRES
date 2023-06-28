@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/principal"
+    android:background="@color/terceary"
     tools:context=".InformacionFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -13,15 +13,128 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/txtResult"
-            android:layout_width="345dp"
-            android:layout_height="565dp"
-            android:layout_marginTop="80dp"
-            android:layout_marginEnd="32dp"
+            android:id="@+id/blueshape"
+            android:layout_width="348dp"
+            android:layout_height="236dp"
+            android:layout_marginTop="60dp"
             android:background="@drawable/borde"
-            android:text="Clima"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/txtLugar"
+            android:layout_width="156dp"
+            android:layout_height="29dp"
+            android:layout_marginTop="16dp"
+            android:textAlignment="textStart"
+            android:textColor="@color/secondary"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.19"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/blueshape" />
+
+        <TextView
+            android:id="@+id/txtTemp"
+            android:layout_width="162dp"
+            android:layout_height="86dp"
+            android:layout_marginStart="48dp"
+            android:layout_marginTop="12dp"
+            android:textAlignment="center"
+            android:textColor="@color/secondary"
+            android:textSize="60sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtLugar" />
+
+        <TextView
+            android:id="@+id/txtSenT"
+            android:layout_width="185dp"
+            android:layout_height="61dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="40dp"
+            android:textAlignment="textEnd"
+            android:textColor="@color/secondary"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            map:layout_constraintTop_toBottomOf="@+id/txtLugar" />
+
+        <TextView
+            android:id="@+id/txtClima"
+            android:layout_width="117dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="48dp"
+            android:layout_marginTop="16dp"
+            android:textAlignment="textStart"
+            android:textColor="@color/secondary"
+            android:textSize="20sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtTemp" />
+
+        <TextView
+            android:id="@+id/txtDescription"
+            android:layout_width="153dp"
+            android:layout_height="26dp"
+            android:layout_marginStart="48dp"
+            android:layout_marginTop="36dp"
+            android:textAlignment="textStart"
+            android:textColor="@color/secondary"
+            android:textSize="20sp"
+            map:layout_constraintStart_toStartOf="parent"
+            map:layout_constraintTop_toBottomOf="@+id/txtTemp" />
+
+        <TextView
+            android:id="@+id/txtNubes"
+            android:layout_width="348dp"
+            android:layout_height="63dp"
+            android:layout_marginTop="32dp"
+            android:background="@drawable/borde"
+            android:textAlignment="center"
+            android:textColor="@color/secondary"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.507"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtHumedad" />
+
+        <TextView
+            android:id="@+id/txtPrec"
+            android:layout_width="348dp"
+            android:layout_height="63dp"
+            android:layout_marginTop="36dp"
+            android:background="@drawable/borde"
+            android:textAlignment="center"
+            android:textColor="@color/secondary"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.507"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/blueshape" />
+
+        <TextView
+            android:id="@+id/txtHumedad"
+            android:layout_width="348dp"
+            android:layout_height="63dp"
+            android:layout_marginTop="32dp"
+            android:background="@drawable/borde"
+            android:textAlignment="center"
+            android:textColor="@color/secondary"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.507"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtPrec" />
+
+        <WebView
+            android:id="@+id/img"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="72dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtSenT" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>
