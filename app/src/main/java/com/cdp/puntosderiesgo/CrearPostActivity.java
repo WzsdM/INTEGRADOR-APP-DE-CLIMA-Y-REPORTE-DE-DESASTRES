@@ -9,6 +9,8 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -39,10 +41,13 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -84,8 +89,6 @@ public class CrearPostActivity extends AppCompatActivity {
         cargarCategorias();
         double latitude = getIntent().getDoubleExtra("latitude",0);
         double longitude = getIntent().getDoubleExtra("longitude",0);
-        String pais=getIntent().getStringExtra("pais");
-        String ciudad=getIntent().getStringExtra("ciudad");
 
         v_btn_imagen.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,7 +99,7 @@ public class CrearPostActivity extends AppCompatActivity {
         v_anadir.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                crearPost(myRef.getKey(),ciudad,pais,latitude,longitude);
+                crearPost(myRef.getKey(),latitude,longitude);
             }
         });
     }
@@ -177,21 +180,68 @@ public class CrearPostActivity extends AppCompatActivity {
         });
 
     }
-    private void crearPost(String id,String ciudad, String pais, Double latitude, Double longitude) {
+    private void crearPost(String id, double latitude, double longitude) {
         String title = v_title.getText().toString();
         String detalle=v_descripcion.getText().toString();
         String categoria = v_categoria.getSelectedItem().toString();
+        final String[] pais = new String[1];
+        final String[] ciudad = new String[1];
+        SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("dd-MM-yyyy");
+        SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("HH:mm:ss");
+        String Fecha = simpleDateFormat1.format(new Date());
+        String Hora = simpleDateFormat2.format(new Date());
 
         HashMap<String,Object> map=new HashMap<>();
         map.put("id",id);
-        map.put("ciudad",ciudad);
-        map.put("pais",pais);
-        map.put("latitude",latitude.toString());
-        map.put("longitude",longitude.toString());
+        map.put("latitude",latitude);
+        map.put("longitude",longitude);
         map.put("title",title);
         map.put("detalle",detalle);
         map.put("categoria",categoria);
+        map.put("fecha",Fecha);
+        map.put("hora",Hora);
         myRef.updateChildren(map);
+
+        String latString= String.valueOf(latitude);
+        String lngString= String.valueOf(longitude);
+        //url de la API call
+        String url =
+                "https://api.openweathermap.org/data/2.5/weather?lat="+latString+"&lon="
+                        +lngString+"&appid=adbcbb553555fc3bfebec807e947eb27&units=metric&lang=es";
+
+        StringRequest postRequest= new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+
+                try {
+
+                    JSONObject jsonObject= new JSONObject(response);
+                    JSONObject jsonObjectSys=jsonObject.getJSONObject("sys");
+
+                    pais[0] =jsonObjectSys.getString("country");//Pais
+
+                    ciudad[0] =jsonObject.getString("name");//Ciudad
+
+                    DatabaseReference refPost;
+                    refPost=FirebaseDatabase.getInstance().getReference("Publicaciones").child(pais[0]).child(ciudad[0]);
+                    refPost.child(mAuth.getUid()).setValue(id);
+
+                }catch (Exception e){
+                    Log.d("TAG","Fallo GET Ciudad CrearPostActivity: "+e);
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(CrearPostActivity.this, error.toString().trim(), Toast.LENGTH_SHORT).show();
+                Log.d("TAG","Fallo GET Ciudad CrearPostActivity: "+error);
+            }
+        });
+        RequestQueue requestQueue=Volley.newRequestQueue(getApplicationContext());
+        requestQueue.add(postRequest);
+
+
         Intent ns=new Intent(CrearPostActivity.this,MainActivity.class);
         startActivity(ns);
     }

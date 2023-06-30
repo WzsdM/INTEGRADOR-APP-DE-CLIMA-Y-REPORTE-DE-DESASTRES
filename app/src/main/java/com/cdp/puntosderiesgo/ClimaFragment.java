@@ -92,6 +92,9 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
                 android.Manifest.permission.ACCESS_COARSE_LOCATION) !=
                 PackageManager.PERMISSION_GRANTED) {
         }
+
+        leerPost();
+
         //Obtener última localización del dispositivo
         fusedLocationClient.getLastLocation()
                 .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
@@ -126,6 +129,7 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
                             //Creamos un detector del mapa del circulo
                             @Override
                             public void onMapClick(@NonNull LatLng latLng) {
+
                                 if(circle.isClickable()){
                                     googleMap.setOnCircleClickListener(new GoogleMap.OnCircleClickListener() {
                                         //Creamos un detector del click del circulo
@@ -135,14 +139,12 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
                                             double latitude= latLng.latitude;
                                             double longitude= latLng.longitude;
 
-                                            String[] ciudadPais=getCiudadPais(latitude,longitude);
-
-                                            //Creamos el enlace para pasar de este fragmento a la actividad de crear publicaciones
                                             Intent ns=new Intent(getView().getContext(),CrearPostActivity.class);
                                             ns.putExtra("latitude", latitude);
                                             ns.putExtra("longitude", longitude);
-                                            ns.putExtra("ciudad", ciudadPais[0]);
-                                            ns.putExtra("pais", ciudadPais[1]);
+
+                                            //Creamos el enlace para pasar de este fragmento a la actividad de crear publicaciones
+
                                             startActivity(ns);
                                         }
                                     });
@@ -160,48 +162,8 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
 
     }
 
-    private String[] getCiudadPais(double latubicacion, double lngubicacion){
-        String latString= String.valueOf(latubicacion);
-        String lngString= String.valueOf(lngubicacion);
-        final String[] ciudad = new String[2];
-        //url de la API call
-        String url =
-                "https://api.openweathermap.org/data/2.5/weather?lat="+latString+"&lon="
-                        +lngString+"&appid=adbcbb553555fc3bfebec807e947eb27&units=metric&lang=es";
+    private void leerPost(){
 
-        //Request del método GET(lectura de datos)
-        StringRequest postRequest=new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-            @Override
-            //Capturamos la respuesta del GET en variables
-            public void onResponse(String response) {
-                //Conversión de json a objeto para extraer los datos
-                try {
-
-                    JSONObject jsonObject= new JSONObject(response);
-                    JSONObject jsonObjectSys=jsonObject.getJSONObject("sys");
-
-                    String cityName=jsonObject.getString("name");//Ciudad
-                    String countryName=jsonObjectSys.getString("country");//Pais
-                    ciudad[0] =cityName;
-                    ciudad[1] =countryName;
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                //enviar error si en caso hubiera
-                Log.e("error",error.getMessage());
-                ciudad[0] ="";
-                ciudad[1]="";
-            }
-        });
-
-        //enviar la petición
-        RequestQueue requestQueue = Volley.newRequestQueue(getView().getContext());
-        requestQueue.add(postRequest);
-        return ciudad;
     }
 
 }
