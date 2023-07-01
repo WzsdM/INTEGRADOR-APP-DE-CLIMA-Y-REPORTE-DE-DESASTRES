@@ -1,26 +1,20 @@
 package com.cdp.puntosderiesgo;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -31,9 +25,6 @@ import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class ClimaFragment extends Fragment implements OnMapReadyCallback {
 
@@ -61,35 +52,18 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
         //Sincronizar mapa
         assert mapFragment != null;
         mapFragment.getMapAsync(this);
-        //iniciar el método para obtener los permisos de localización
-        getLocalizacion(view);
 
         return view;
     }
 
-
-
-    private void getLocalizacion(View view) {
-        //Pedir los permisos de localización
-        int permiso = ContextCompat.checkSelfPermission(view.getContext(), android.Manifest.permission.ACCESS_COARSE_LOCATION);
-        if(permiso == PackageManager.PERMISSION_DENIED){
-            if(ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION)){
-            }else{
-                ActivityCompat.requestPermissions(requireActivity(), new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-            }
-        }
-    }
-
-
-
-    @Override
     //Acciones a ejecutar cuando el mapa se carga
+        @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         //revisar permisos de localización
         if (ActivityCompat.checkSelfPermission(requireView().getContext(),
-                android.Manifest.permission.ACCESS_FINE_LOCATION) !=
+                Manifest.permission.ACCESS_FINE_LOCATION) !=
                 PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(requireView().getContext(),
-                android.Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                Manifest.permission.ACCESS_COARSE_LOCATION) !=
                 PackageManager.PERMISSION_GRANTED) {
         }
 
@@ -117,6 +91,7 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
 
                         //Movemos la cámara a la ubicación
                         googleMap.moveCamera(CameraUpdateFactory.newLatLng(primeraUbicacion));
+
                         //Crear el área circular al rededor de la última ubicación
                         Circle circle = googleMap.addCircle(new CircleOptions()
                                 .center(primeraUbicacion)
@@ -124,13 +99,20 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
                                 .strokeColor(Color.TRANSPARENT)
                                 .fillColor(0x50ffd500)
                                 .clickable(true));
+                        googleMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
+                            @Override
+                            public void onMyLocationChange(@NonNull Location location) {
+                                LatLng nuevaubicacion=new LatLng(location.getLatitude(),location.getLongitude());
+                                        circle.setCenter(nuevaubicacion);
+                        }
+                    });
+
 
                         googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                             //Creamos un detector del mapa del circulo
                             @Override
                             public void onMapClick(@NonNull LatLng latLng) {
 
-                                if(circle.isClickable()){
                                     googleMap.setOnCircleClickListener(new GoogleMap.OnCircleClickListener() {
                                         //Creamos un detector del click del circulo
                                         @Override
@@ -149,7 +131,6 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
                                         }
                                     });
                                 }
-                            }
                         });
 
                     }
@@ -157,6 +138,7 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
 
         //Habilitamos la ubicación en tiempo real en Google Maps
         googleMap.setMyLocationEnabled(true);
+
         //Desabilitamos el botón de ir a la localización
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
 

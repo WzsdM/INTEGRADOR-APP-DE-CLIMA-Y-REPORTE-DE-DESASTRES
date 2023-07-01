@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -20,6 +21,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,7 +37,7 @@ public class InformacionFragment extends Fragment {
     TextView v_prec;
     TextView v_humedad;
     TextView v_sens;
-    WebView img;
+    ImageView img;
 
     public InformacionFragment() {
         // Required empty public constructor
@@ -122,6 +124,8 @@ public class InformacionFragment extends Fragment {
                     String temperatura=temp+" °C";
                     SpannableString ss1=  new SpannableString(temperatura);
                     ss1.setSpan(new RelativeSizeSpan(0.4f), 3,8, 0); // set size
+                    String urlImg="http://openweathermap.org/img/wn/" + icon + "@2x.png";
+                    String urlPicasso="https://i.imgur.com/DvpvklR.png";
 
                     v_lugar.setText(cityName+"("+countryName+")");
                     v_temp.setText(ss1);
@@ -131,8 +135,9 @@ public class InformacionFragment extends Fragment {
                     v_humedad.setText("Humedad : "+humidity+"g/m3");
                     v_sens.setText("Sensación Térmica: "+temp_like+" °C");
                     v_nubes.setText("Nubes : "+clouds+", Viento : "+wind+"km/h");
-
-
+                    Picasso.with(getView().getContext()).load(urlImg)
+                            .fit()
+                            .into(img);
 
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
