@@ -1,9 +1,14 @@
 package com.cdp.puntosderiesgo;
 
+import android.Manifest;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -22,6 +27,10 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            AccessLocate();
+        }
+
         //Vincular el menú de navegación
         BottomNavigationView navigation = findViewById(R.id.bottom_navigation);
         //habilitar el detector cuando se seleccione un item de la lista del menú de navegación
@@ -32,6 +41,30 @@ public class MainActivity extends AppCompatActivity{
             navigation.setSelectedItemId(R.id.añadir);
             loadFragment(climaFragment);
         }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void AccessLocate() {
+        ActivityResultLauncher<String[]> locationPermissionRequest =
+                registerForActivityResult(new ActivityResultContracts
+                                .RequestMultiplePermissions(), result -> {
+                            Boolean fineLocationGranted = result.getOrDefault(
+                                    android.Manifest.permission.ACCESS_FINE_LOCATION, false);
+                            Boolean coarseLocationGranted = result.getOrDefault(
+                                    android.Manifest.permission.ACCESS_COARSE_LOCATION, false);
+                            if (fineLocationGranted != null && fineLocationGranted) {
+                                // Precise location access granted.
+                            } else if (coarseLocationGranted != null && coarseLocationGranted) {
+                                // Only approximate location access granted.
+                            } else {
+                                // No location access granted.
+                            }
+                        }
+                );
+        locationPermissionRequest.launch(new String[]{
+                android.Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+        });
     }
 
     //crear variable del detector cuando un item es seleccionado de la lista del menú de navegación

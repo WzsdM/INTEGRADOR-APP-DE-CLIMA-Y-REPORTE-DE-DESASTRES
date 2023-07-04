@@ -186,10 +186,8 @@ public class CrearPostActivity extends AppCompatActivity {
         String categoria = v_categoria.getSelectedItem().toString();
         final String[] pais = new String[1];
         final String[] ciudad = new String[1];
-        SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("dd-MM-yyyy");
-        SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("HH:mm:ss");
-        String Fecha = simpleDateFormat1.format(new Date());
-        String Hora = simpleDateFormat2.format(new Date());
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        String FechaHora = simpleDateFormat.format(new Date());
 
         HashMap<String,Object> map=new HashMap<>();
         map.put("id",id);
@@ -198,8 +196,7 @@ public class CrearPostActivity extends AppCompatActivity {
         map.put("title",title);
         map.put("detalle",detalle);
         map.put("categoria",categoria);
-        map.put("fecha",Fecha);
-        map.put("hora",Hora);
+        map.put("fecha",FechaHora);
         myRef.updateChildren(map);
 
         String latString= String.valueOf(latitude);

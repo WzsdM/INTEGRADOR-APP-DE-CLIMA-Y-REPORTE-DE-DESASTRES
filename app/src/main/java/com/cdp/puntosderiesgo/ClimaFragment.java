@@ -5,13 +5,17 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
@@ -45,6 +49,7 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
                              Bundle savedInstanceState) {
         //Creación de la vista
         View view = inflater.inflate(R.layout.fragment_mapa, container, false);
+
         //Valor de la locación actual del cliente
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(view.getContext());
         //Conexión del fragmento del mapa Google
@@ -56,20 +61,20 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
         return view;
     }
 
+
+
     //Acciones a ejecutar cuando el mapa se carga
-        @Override
+    @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
-        //revisar permisos de localización
-        if (ActivityCompat.checkSelfPermission(requireView().getContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION) !=
-                PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(requireView().getContext(),
-                Manifest.permission.ACCESS_COARSE_LOCATION) !=
-                PackageManager.PERMISSION_GRANTED) {
-        }
 
         leerPost();
 
         //Obtener última localización del dispositivo
+        if (ActivityCompat.checkSelfPermission(getView().getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getView().getContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
         fusedLocationClient.getLastLocation()
                 .addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
                     @Override
@@ -79,8 +84,8 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
                         LatLng primeraUbicacion = new LatLng(location.getLatitude(), location.getLongitude());
 
                         //Obtenemos por separado la longitud y latitud
-                        double latubicacion=location.getLatitude();
-                        double lngubicacion=location.getLongitude();
+                        double latubicacion = location.getLatitude();
+                        double lngubicacion = location.getLongitude();
                         //creamos un bundle para pasar los datos
                         Bundle result = new Bundle();
                         //Añadimos la longitud y latitud al bundle
@@ -102,10 +107,10 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
                         googleMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
                             @Override
                             public void onMyLocationChange(@NonNull Location location) {
-                                LatLng nuevaubicacion=new LatLng(location.getLatitude(),location.getLongitude());
-                                        circle.setCenter(nuevaubicacion);
-                        }
-                    });
+                                LatLng nuevaubicacion = new LatLng(location.getLatitude(), location.getLongitude());
+                                circle.setCenter(nuevaubicacion);
+                            }
+                        });
 
 
                         googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
@@ -113,24 +118,24 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
                             @Override
                             public void onMapClick(@NonNull LatLng latLng) {
 
-                                    googleMap.setOnCircleClickListener(new GoogleMap.OnCircleClickListener() {
-                                        //Creamos un detector del click del circulo
-                                        @Override
-                                        public void onCircleClick(@NonNull Circle circle) {
-                                            //Obtenemos la lat, y long del click
-                                            double latitude= latLng.latitude;
-                                            double longitude= latLng.longitude;
+                                googleMap.setOnCircleClickListener(new GoogleMap.OnCircleClickListener() {
+                                    //Creamos un detector del click del circulo
+                                    @Override
+                                    public void onCircleClick(@NonNull Circle circle) {
+                                        //Obtenemos la lat, y long del click
+                                        double latitude = latLng.latitude;
+                                        double longitude = latLng.longitude;
 
-                                            Intent ns=new Intent(getView().getContext(),CrearPostActivity.class);
-                                            ns.putExtra("latitude", latitude);
-                                            ns.putExtra("longitude", longitude);
+                                        Intent ns = new Intent(getView().getContext(), CrearPostActivity.class);
+                                        ns.putExtra("latitude", latitude);
+                                        ns.putExtra("longitude", longitude);
 
-                                            //Creamos el enlace para pasar de este fragmento a la actividad de crear publicaciones
+                                        //Creamos el enlace para pasar de este fragmento a la actividad de crear publicaciones
 
-                                            startActivity(ns);
-                                        }
-                                    });
-                                }
+                                        startActivity(ns);
+                                    }
+                                });
+                            }
                         });
 
                     }
