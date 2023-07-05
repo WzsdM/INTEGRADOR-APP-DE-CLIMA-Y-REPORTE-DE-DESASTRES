@@ -1,21 +1,24 @@
 package com.cdp.puntosderiesgo.clases;
 
 public class Post {
-    String id,titulo,detalle,categoria,ciudad,pais;
+    String id;
+    String title;
+    String detalle;
+    String categoria;
     double latitude,longitude;
+    String photo;
 
     public Post() {
     }
 
-    public Post(String id, String titulo, String detalle, String categoria, String ciudad, String pais, double latitude, double longitude) {
+    public Post(String id, String title, String detalle, String categoria, double latitude, double longitude,String photo) {
         this.id = id;
-        this.titulo = titulo;
+        this.title = title;
         this.detalle = detalle;
         this.categoria = categoria;
-        this.ciudad = ciudad;
-        this.pais = pais;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.photo=photo;
     }
 
     public String getId() {
@@ -26,12 +29,12 @@ public class Post {
         this.id = id;
     }
 
-    public String getTitulo() {
-        return titulo;
+    public String getTitle() {
+        return title;
     }
 
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getDetalle() {
@@ -50,22 +53,6 @@ public class Post {
         this.categoria = categoria;
     }
 
-    public String getCiudad() {
-        return ciudad;
-    }
-
-    public void setCiudad(String ciudad) {
-        this.ciudad = ciudad;
-    }
-
-    public String getPais() {
-        return pais;
-    }
-
-    public void setPais(String pais) {
-        this.pais = pais;
-    }
-
     public double getLatitude() {
         return latitude;
     }
@@ -81,6 +68,15 @@ public class Post {
     public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
+
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
+    }
+
     public String toString(String nombre){
         return nombre;
     }

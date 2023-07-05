@@ -221,7 +221,7 @@ public class CrearPostActivity extends AppCompatActivity {
 
                     DatabaseReference refPost;
                     refPost=FirebaseDatabase.getInstance().getReference("Publicaciones").child(pais[0]).child(ciudad[0]);
-                    refPost.child(mAuth.getUid()).setValue(id);
+                    refPost.child(mAuth.getUid()).child(id).setValue("");
 
                 }catch (Exception e){
                     Log.d("TAG","Fallo GET Ciudad CrearPostActivity: "+e);
