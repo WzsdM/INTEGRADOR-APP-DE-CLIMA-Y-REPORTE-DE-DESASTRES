@@ -9,89 +9,157 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/principal">
+        android:background="@color/white">
 
         <TextView
-            android:id="@+id/textView"
-            android:layout_width="407dp"
-            android:layout_height="84dp"
-            android:layout_marginTop="44dp"
-            android:background="@color/terceary"
-            android:gravity="center_vertical"
-            android:text="Editar Perfil"
-            android:textAlignment="center"
-            android:textColor="#000000"
-            android:textSize="34sp"
+            android:id="@+id/backgroundPerfil"
+            android:layout_width="match_parent"
+            android:layout_height="196dp"
+            android:background="@color/principal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView2" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/textView6"
-            android:layout_width="407dp"
-            android:layout_height="84dp"
-            android:background="@color/terceary"
-            android:gravity="center_vertical"
-            android:text="Configuración"
-            android:textAlignment="center"
-            android:textColor="@color/secondary"
-            android:textSize="34sp"
+            android:id="@+id/backgroundCirculo"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_marginTop="120dp"
+            android:background="@drawable/circulo"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView4" />
-
-        <TextView
-            android:id="@+id/textView8"
-            android:layout_width="407dp"
-            android:layout_height="84dp"
-            android:background="@color/terceary"
-            android:gravity="center_vertical"
-            android:text="Política de Privacidad"
-            android:textAlignment="center"
-            android:textColor="@color/secondary"
-            android:textSize="34sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cerrarSesion" />
-
-        <TextView
-            android:id="@+id/cerrarSesion"
-            android:layout_width="407dp"
-            android:layout_height="84dp"
-            android:background="@color/quarter"
-            android:gravity="center_vertical"
-            android:text="Cerrar Sesión"
-            android:textAlignment="center"
-            android:textColor="@color/secondary"
-            android:textSize="34sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView6" />
-
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="407dp"
-            android:layout_height="84dp"
-            android:background="@color/quarter"
-            android:gravity="center_vertical"
-            android:text="Mis Publicaciones"
-            android:textAlignment="center"
-            android:textColor="@color/secondary"
-            android:textSize="34sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView" />
-
-        <ImageView
-            android:id="@+id/imageView2"
-            android:layout_width="201dp"
-            android:layout_height="206dp"
-            android:layout_marginTop="56dp"
-            android:src="@drawable/user_solid"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/nombreUsuario"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginTop="68dp"
+            android:background="@drawable/borde"
+            android:text="Nombre de Usuario"
+            android:textColor="@color/secondary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.503"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/imagenPerfil"
+            android:layout_width="125dp"
+            android:layout_height="125dp"
+            android:layout_marginTop="132dp"
+            android:background="@drawable/circuloblanco"
+            android:src="@drawable/borde"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/backgroundPerfil" />
+
+        <TextView
+            android:id="@+id/btnEditar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="132dp"
+            android:background="@drawable/circuloblanco"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.754"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/iconLapiz"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="132dp"
+            android:src="@mipmap/lapiz_foreground"
+            android:translationX="5dp"
+            android:translationY="-5dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.747"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/iconCorreo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="36dp"
+            android:src="@mipmap/correo_round"
+            android:translationX="5dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.047"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/backgroundCirculo" />
+
+        <TextView
+            android:id="@+id/emailProfile"
+            android:layout_width="284dp"
+            android:layout_height="55dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="120dp"
+            android:background="@drawable/bordetrans"
+            android:text="Correo Electrónico"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:translationX="5dp"
+            app:layout_constraintStart_toEndOf="@+id/iconCorreo"
+            app:layout_constraintTop_toBottomOf="@+id/backgroundPerfil" />
+
+        <ImageView
+            android:id="@+id/btnCerrarSesion"
+            android:layout_width="110dp"
+            android:layout_height="110dp"
+            android:layout_marginTop="236dp"
+            android:src="@mipmap/salir"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.777"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/backgroundPerfil" />
+
+        <TextView
+            android:id="@+id/politicasPrivacidad"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="404dp"
+            android:background="@drawable/bordetrans"
+            android:text="Políticas de Seguridad"
+            android:textAlignment="center"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/backgroundPerfil" />
+
+        <TextView
+            android:id="@+id/txtConfig"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="80dp"
+            android:text="Configuración"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btnConfiguracion" />
+
+        <TextView
+            android:id="@+id/txtCerrarSesion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="80dp"
+            android:text="Cerrar Sesión"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btnCerrarSesion" />
+
+        <ImageView
+            android:id="@+id/btnConfiguracion"
+            android:layout_width="110dp"
+            android:layout_height="110dp"
+            android:layout_marginTop="236dp"
+            android:src="@mipmap/config"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.222"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/backgroundPerfil" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

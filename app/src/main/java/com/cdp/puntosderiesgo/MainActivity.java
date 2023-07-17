@@ -48,29 +48,12 @@ public class MainActivity extends AppCompatActivity{
     }
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-
         if(keyCode==event.KEYCODE_BACK){
-            AlertDialog.Builder builder= new AlertDialog.Builder(this);
-            builder.setMessage("¿Quieres cerrar Harkay?")
-                    .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
                             Intent intent=new Intent(Intent.ACTION_MAIN);
                             intent.addCategory(Intent.CATEGORY_HOME);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(intent);
-                        }
-                    })
-                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    })
-            ;
-            builder.show();
         }
-
         return super.onKeyDown(keyCode, event);
     }
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -120,15 +103,7 @@ public class MainActivity extends AppCompatActivity{
 
     //Método para reemplazar de un fragmento a otro
     public void loadFragment(Fragment fragment){
-        String backStateName = fragment.getClass().getName();
-
-        boolean fragmentPopped = getSupportFragmentManager().popBackStackImmediate (backStateName, 0);
         FragmentTransaction transaction= getSupportFragmentManager().beginTransaction();
-
-        if (!fragmentPopped){ //fragment not in back stack, create it.
-            transaction.replace(R.id.frame_container,fragment);
-            transaction.addToBackStack(backStateName);
-        }
         transaction.replace(R.id.frame_container, fragment);
         transaction.commit();
 

@@ -2,16 +2,20 @@ package com.cdp.puntosderiesgo;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.style.RelativeSizeSpan;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -40,6 +44,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -161,11 +166,14 @@ public class CrearPostActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(Uri uri) {
                             String download_uri=uri.toString();
+                            Picasso.with(CrearPostActivity.this).load(download_uri)
+                                    .fit()
+                                    .into(v_suibr_imagen);
                             HashMap<String,Object> map=new HashMap<>();
                             map.put("photo",download_uri);
                             myRef.updateChildren(map);
                             progressDialog.dismiss();
-                            Toast.makeText(CrearPostActivity.this,"Foto Actualizada",Toast.LENGTH_SHORT);
+                            Toast.makeText(CrearPostActivity.this,"Foto Actualizada",Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
@@ -175,72 +183,97 @@ public class CrearPostActivity extends AppCompatActivity {
             public void onFailure(@NonNull Exception e) {
                 Log.d("TAG","Error al subir Foto", e);
                 progressDialog.dismiss();
-                Toast.makeText(CrearPostActivity.this,"Error al subir Foto",Toast.LENGTH_SHORT);
+                Toast.makeText(CrearPostActivity.this,"Error al subir Foto",Toast.LENGTH_SHORT).show();
             }
         });
 
     }
     private void crearPost(String id, double latitude, double longitude) {
-        String title = v_title.getText().toString();
-        String detalle=v_descripcion.getText().toString();
-        String categoria = v_categoria.getSelectedItem().toString();
-        final String[] pais = new String[1];
-        final String[] ciudad = new String[1];
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        String FechaHora = simpleDateFormat.format(new Date());
+        if(v_title.getText().toString().equals("")||v_descripcion.getText().toString().equals("")){
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Por favor introducir todos los datos")
+                    .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            builder.show();
+        } else if (image_url==null) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Es necesario subir una imagen del suceso")
+                    .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            builder.show();
+        } else {
+            String title = v_title.getText().toString();
+            String detalle = v_descripcion.getText().toString();
+            String categoria = v_categoria.getSelectedItem().toString();
+            final String[] pais = new String[1];
+            final String[] ciudad = new String[1];
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+            String FechaHora = simpleDateFormat.format(new Date());
 
-        HashMap<String,Object> map=new HashMap<>();
-        map.put("id",id);
-        map.put("latitude",latitude);
-        map.put("longitude",longitude);
-        map.put("title",title);
-        map.put("detalle",detalle);
-        map.put("categoria",categoria);
-        map.put("fecha",FechaHora);
-        myRef.updateChildren(map);
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("id", id);
+            map.put("latitude", latitude);
+            map.put("longitude", longitude);
+            map.put("title", title);
+            map.put("detalle", detalle);
+            map.put("categoria", categoria);
+            map.put("fecha", FechaHora);
+            myRef.updateChildren(map);
 
-        String latString= String.valueOf(latitude);
-        String lngString= String.valueOf(longitude);
-        //url de la API call
-        String url =
-                "https://api.openweathermap.org/data/2.5/weather?lat="+latString+"&lon="
-                        +lngString+"&appid=adbcbb553555fc3bfebec807e947eb27&units=metric&lang=es";
+            String latString = String.valueOf(latitude);
+            String lngString = String.valueOf(longitude);
+            //url de la API call
+            String url =
+                    "https://api.openweathermap.org/data/2.5/weather?lat=" + latString + "&lon="
+                            + lngString + "&appid=adbcbb553555fc3bfebec807e947eb27&units=metric&lang=es";
 
-        StringRequest postRequest= new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
+            StringRequest postRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
 
-                try {
+                    try {
 
-                    JSONObject jsonObject= new JSONObject(response);
-                    JSONObject jsonObjectSys=jsonObject.getJSONObject("sys");
+                        JSONObject jsonObject = new JSONObject(response);
+                        JSONObject jsonObjectSys = jsonObject.getJSONObject("sys");
 
-                    pais[0] =jsonObjectSys.getString("country");//Pais
+                        pais[0] = jsonObjectSys.getString("country");//Pais
 
-                    ciudad[0] =jsonObject.getString("name");//Ciudad
+                        ciudad[0] = jsonObject.getString("name");//Ciudad
 
-                    DatabaseReference refPost;
-                    refPost=FirebaseDatabase.getInstance().getReference("Publicaciones").child(pais[0]).child(ciudad[0]);
-                    refPost.child(mAuth.getUid()).child(id).setValue("");
+                        DatabaseReference refPost;
+                        refPost = FirebaseDatabase.getInstance().getReference("Publicaciones").child(pais[0]).child(ciudad[0]);
+                        refPost.child(mAuth.getUid()).child(id).setValue("");
 
-                }catch (Exception e){
-                    Log.d("TAG","Fallo GET Ciudad CrearPostActivity: "+e);
+                    } catch (Exception e) {
+                        Log.d("TAG", "Fallo GET Ciudad CrearPostActivity: " + e);
+                    }
+
                 }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(CrearPostActivity.this, error.toString().trim(), Toast.LENGTH_SHORT).show();
+                    Log.d("TAG", "Fallo GET Ciudad CrearPostActivity: " + error);
+                }
+            });
+            RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+            requestQueue.add(postRequest);
 
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(CrearPostActivity.this, error.toString().trim(), Toast.LENGTH_SHORT).show();
-                Log.d("TAG","Fallo GET Ciudad CrearPostActivity: "+error);
-            }
-        });
-        RequestQueue requestQueue=Volley.newRequestQueue(getApplicationContext());
-        requestQueue.add(postRequest);
+            Toast.makeText(CrearPostActivity.this,"Punto de Riesgo creado exitosamente",Toast.LENGTH_SHORT).show();
 
-
-        Intent ns=new Intent(CrearPostActivity.this,MainActivity.class);
-        startActivity(ns);
+            Intent ns = new Intent(CrearPostActivity.this, MainActivity.class);
+            ns.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            ns.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(ns);
+        }
     }
 
     public String idGenerator(){
@@ -257,4 +290,26 @@ public class CrearPostActivity extends AppCompatActivity {
         }
         return num;
     }
+
+    @Override
+    public void onBackPressed(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("¿Salir al menú principal? se perderán los datos")
+                .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(CrearPostActivity.this,MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        builder.show();
+    }
+
 }

@@ -1,19 +1,25 @@
 package com.cdp.puntosderiesgo;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import com.google.maps.android.SphericalUtil;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.android.volley.Request;
@@ -26,11 +32,11 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.OnCircleClickListener;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
@@ -42,7 +48,10 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.maps.android.SphericalUtil;
+import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -53,6 +62,8 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
 
     // Proveedor de la locación actual del cliente.
     private FusedLocationProviderClient fusedLocationClient;
+    private ImageView climahoy;
+    private TextView deschoy;
 
     public ClimaFragment() {
         // Required empty public constructor
@@ -68,6 +79,9 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
                              Bundle savedInstanceState) {
         //Creación de la vista
         View view = inflater.inflate(R.layout.fragment_mapa, container, false);
+
+        climahoy=view.findViewById(R.id.iconclimahoy);
+        deschoy=view.findViewById(R.id.estadoclimahoy);
 
         //Valor de la locación actual del cliente
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(view.getContext());
@@ -124,11 +138,23 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
 
                                     JSONObject jsonObject = new JSONObject(response);
                                     JSONObject jsonObjectSys = jsonObject.getJSONObject("sys");
+                                    JSONArray jsonArray = jsonObject.getJSONArray("weather");
+                                    JSONObject jsonObjectWeather=jsonArray.getJSONObject(0);
+                                    String description=jsonObjectWeather.getString("description");
+                                    String icon=jsonObjectWeather.getString("icon");
 
                                     String countryName = jsonObjectSys.getString("country");//Pais
                                     String cityName = jsonObject.getString("name");//Ciudad
 
+                                    String urlImg="http://openweathermap.org/img/wn/" + icon + "@2x.png";
+
+                                    deschoy.setText(description);
+                                    Picasso.with(getView().getContext())
+                                            .load(urlImg)
+                                            .into(climahoy);
                                     leerPost(googleMap, countryName, cityName);
+
+
 
                                     googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                                         @Override
@@ -184,9 +210,6 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
 
                                 double latitude = latLng.latitude;
                                 double longitude = latLng.longitude;
-
-                                double latitudecircle = circle.getCenter().latitude;
-                                double longitudecircle = circle.getCenter().longitude;
 
                                 double radius = circle.getRadius();
 
@@ -325,12 +348,6 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
                                                                 .getValue();
                                                         double longitude= (double) snapshot.child(postid).child("longitude")
                                                                 .getValue();
-                                                        String photo=snapshot.child(postid).child("photo")
-                                                                .getValue().toString();
-                                                        String id=snapshot.child(postid).child("id")
-                                                                .getValue().toString();
-                                                        String detalle=snapshot.child(postid).child("detalle")
-                                                                .getValue().toString();
 
                                                         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
                                                         String fechaHoraActual = simpleDateFormat.format(new Date());
@@ -357,11 +374,11 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
                                                                 LatLng posMarker = new LatLng(latitude, longitude);
                                                                 BitmapDescriptor icon = null;
                                                                 if (categoria.equals("Desastre Natural")) {
-                                                                    icon = BitmapDescriptorFactory.fromResource(R.mipmap.ic_marker_desastre_natural_foreground);
+                                                                    icon = bitmapDescriptorFromVector(getActivity(), R.drawable.desastre);
                                                                 } else if (categoria.equals("Accidente")) {
-                                                                    icon = BitmapDescriptorFactory.fromResource(R.mipmap.ic_marker_accidente_foreground);
+                                                                    icon = bitmapDescriptorFromVector(getActivity(), R.drawable.accidente);
                                                                 } else {
-                                                                    icon = BitmapDescriptorFactory.fromResource(R.mipmap.ic_marker_peligro_entorno_foreground);
+                                                                    icon = bitmapDescriptorFromVector(getActivity(), R.drawable.entorno);
                                                                 }
 
                                                                 Marker post = googleMap.addMarker(new MarkerOptions()
@@ -371,6 +388,20 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
                                                                 );
 
                                                                 post.setTag(postid);
+                                                                googleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+
+                                                                    private float currentZoom = 12;
+
+                                                                    @Override
+                                                                    public void onCameraChange(CameraPosition newPosition) {
+                                                                        if (newPosition.zoom < currentZoom){
+                                                                            post.setVisible(false);
+                                                                        }
+                                                                        else{
+                                                                            post.setVisible(true);
+                                                                        }
+                                                                    }
+                                                                });
                                                             }
 
                                                         } catch (Exception e) {
@@ -402,6 +433,15 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
+    }
+
+    private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
+        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
+        vectorDrawable.setBounds(0, 0,100, 100);
+        Bitmap bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        vectorDrawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
 }

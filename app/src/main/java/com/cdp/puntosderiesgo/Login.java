@@ -1,9 +1,11 @@
 package com.cdp.puntosderiesgo;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.SpannableString;
@@ -11,6 +13,7 @@ import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -21,6 +24,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class Login extends AppCompatActivity {
 
@@ -60,6 +68,33 @@ public class Login extends AppCompatActivity {
     @Override
     protected void onStart(){
         super.onStart();
+
+        String username= getIntent().getStringExtra("username");
+        String idFotolocal= getIntent().getStringExtra("userPhoto");
+        String emailUser= getIntent().getStringExtra("email");
+
+            if(username!=null&&idFotolocal!=null){
+                DatabaseReference comprobar = (DatabaseReference) FirebaseDatabase.getInstance().getReference()
+                        .child("Usuarios");
+
+                comprobar.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.child(mAuth.getUid()).exists()) {
+                        }else{
+                                comprobar.child(mAuth.getUid()).child("username").setValue(username);
+                                comprobar.child(mAuth.getUid()).child("userPhoto").setValue(idFotolocal);
+                                comprobar.child(mAuth.getUid()).child("email").setValue(emailUser);
+                            }
+                        }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            }
+
         mAuth.addAuthStateListener(new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -76,43 +111,73 @@ public class Login extends AppCompatActivity {
     }
 
     public void doCargar(View view){
-
-        String email= v_email.getText().toString().trim();
-        String password= v_clave.getText().toString().trim();
-
-        progressDialog.setMessage("Accediendo a la cuenta...");
-        progressDialog.show();
-
-        mAuth.signInWithEmailAndPassword(email,password).
-                addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()){
-
-                            Log.d("TAG","login:success");
-                            Toast.makeText(Login.this,
-                                    "Acceso Correcto",
-                                    Toast.LENGTH_LONG).show();
-
-                            Intent ns=new Intent(Login.this,MainActivity.class);
-                            startActivity(ns);
-
-                        }else{
-                            Log.d("TAG","login:failure",
-                                    task.getException());
-                            Toast.makeText(Login.this,
-                                    "No se pudo Acceder",
-                                    Toast.LENGTH_LONG).show();
+        if(v_email.getText().toString().trim().equals("")||v_clave.getText().toString().trim().equals("")){
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Por favor introducir todos los datos")
+                    .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
                         }
-                        progressDialog.dismiss();
-                    }
-                });
+                    });
+            builder.show();
+        }else {
 
+            String email = v_email.getText().toString().trim();
+            String password = v_clave.getText().toString().trim();
+
+            progressDialog.setMessage("Accediendo a la cuenta...");
+            progressDialog.show();
+
+            mAuth.signInWithEmailAndPassword(email, password).
+                    addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+
+                                Log.d("TAG", "login:success");
+                                Toast.makeText(Login.this,
+                                        "Acceso Correcto",
+                                        Toast.LENGTH_LONG).show();
+
+                                Intent ns = new Intent(Login.this, MainActivity.class);
+                                startActivity(ns);
+
+                            } else {
+                                Log.d("TAG", "login:failure",
+                                        task.getException());
+                                Toast.makeText(Login.this,
+                                        "No se pudo Acceder",
+                                        Toast.LENGTH_LONG).show()
+                                ;
+                            }
+                            progressDialog.dismiss();
+                        }
+                    })
+            ;
+        }
     }
 
-    public void passtoRegister(){
+    public void passtoRegister(View view){
         Intent ns=new Intent(Login.this,Register.class);
         startActivity(ns);
+    }
+
+    private void Delete(String uri){
+        FirebaseDatabase.getInstance().getReference()
+                .child("Register").child(uri).removeValue();
+    }
+
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode==event.KEYCODE_BACK){
+            Intent intent=new Intent(Intent.ACTION_MAIN);
+            intent.addCategory(Intent.CATEGORY_HOME);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
 }

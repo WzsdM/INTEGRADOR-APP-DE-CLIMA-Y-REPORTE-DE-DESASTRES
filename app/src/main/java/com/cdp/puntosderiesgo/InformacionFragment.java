@@ -27,6 +27,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DecimalFormat;
+
 public class InformacionFragment extends Fragment {
 
     TextView v_lugar;
@@ -121,7 +123,7 @@ public class InformacionFragment extends Fragment {
 
                     double wind=jsonObjectWind.getDouble("speed");//Velocidad del viento
 
-                    String temperatura=temp+" °C";
+                    String temperatura=obtieneDosDecimales(temp)+" °C";
                     SpannableString ss1=  new SpannableString(temperatura);
                     ss1.setSpan(new RelativeSizeSpan(0.4f), 3,8, 0); // set size
                     String urlImg="http://openweathermap.org/img/wn/" + icon + "@2x.png";
@@ -133,9 +135,9 @@ public class InformacionFragment extends Fragment {
                     v_description.setText(description);
                     v_prec.setText("Precipitación : "+pressure+" PA");
                     v_humedad.setText("Humedad : "+humidity+"g/m3");
-                    v_sens.setText("Sensación Térmica: "+temp_like+" °C");
+                    v_sens.setText("Sensación Térmica: "+obtieneDosDecimales(temp_like)+" °C");
                     v_nubes.setText("Nubes : "+clouds+", Viento : "+wind+"km/h");
-                    Picasso.with(getView().getContext()).load(urlImg)
+                    Picasso.with(view.getContext()).load(urlImg)
                             .fit()
                             .into(img);
 
@@ -156,6 +158,13 @@ public class InformacionFragment extends Fragment {
         //enviar la petición
         RequestQueue requestQueue = Volley.newRequestQueue(view.getContext());
         requestQueue.add(postRequest);
+    }
+
+    private String obtieneDosDecimales(double valor){
+        DecimalFormat format = new DecimalFormat();
+        format.setMinimumFractionDigits(2);
+        format.setMaximumFractionDigits(2); //Define 2 decimales.
+        return format.format(valor);
     }
 
 
