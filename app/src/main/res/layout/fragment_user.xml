@@ -80,27 +80,15 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/iconCorreo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="36dp"
-            android:src="@mipmap/correo_round"
-            android:translationX="5dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.047"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/backgroundCirculo" />
-
         <TextView
             android:id="@+id/emailProfile"
             android:layout_width="284dp"
             android:layout_height="55dp"
-            android:layout_marginStart="4dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="120dp"
             android:background="@drawable/bordetrans"
             android:text="Correo Electrónico"
-            android:textColor="@color/white"
+            android:textColor="@color/secondary"
             android:textSize="14sp"
             android:textStyle="bold"
             android:translationX="5dp"
@@ -108,15 +96,27 @@
             app:layout_constraintTop_toBottomOf="@+id/backgroundPerfil" />
 
         <ImageView
+            android:id="@+id/iconCorreo"
+            android:layout_width="50sp"
+            android:layout_height="50sp"
+            android:layout_marginTop="48dp"
+            android:translationX="5dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.094"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/backgroundCirculo"
+            app:srcCompat="@drawable/email" />
+
+        <ImageView
             android:id="@+id/btnCerrarSesion"
             android:layout_width="110dp"
             android:layout_height="110dp"
             android:layout_marginTop="236dp"
-            android:src="@mipmap/salir"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.777"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/backgroundPerfil" />
+            app:layout_constraintTop_toBottomOf="@+id/backgroundPerfil"
+            app:srcCompat="@drawable/exit" />
 
         <TextView
             android:id="@+id/politicasPrivacidad"
@@ -155,11 +155,11 @@
             android:layout_width="110dp"
             android:layout_height="110dp"
             android:layout_marginTop="236dp"
-            android:src="@mipmap/config"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.222"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/backgroundPerfil" />
+            app:layout_constraintTop_toBottomOf="@+id/backgroundPerfil"
+            app:srcCompat="@drawable/config" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

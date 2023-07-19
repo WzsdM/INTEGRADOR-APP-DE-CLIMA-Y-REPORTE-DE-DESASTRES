@@ -106,15 +106,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/imgregPerfil"
-        android:layout_width="85dp"
+        android:layout_width="90dp"
         android:layout_height="90dp"
         android:layout_marginStart="52dp"
         android:layout_marginTop="20dp"
+        android:background="@drawable/circuloblanco"
+        android:maxWidth="90dp"
+        android:maxHeight="90dp"
+        android:minWidth="90dp"
+        android:minHeight="90dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView5"
-        app:srcCompat="@drawable/ic_default_user" />
+        app:layout_constraintTop_toBottomOf="@+id/textView5" />
 
     <Button
         android:id="@+id/btnPerfilFoto"

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     android:orientation="vertical"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -10,61 +10,80 @@
     tools:context=".PostView" >
 
     <ImageView
-        android:id="@+id/imgPost"
-        android:layout_width="match_parent"
-        android:layout_height="250dp"
+        android:id="@+id/btnComment"
+        android:layout_width="60sp"
+        android:layout_height="60sp"
+        android:alpha="2"
+        android:translationX="-15sp"
+        android:translationY="15sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@tools:sample/avatars" />
+        app:layout_constraintTop_toTopOf="@+id/linearLayout"
+        app:srcCompat="@drawable/coments" />
 
-    <TextView
-        android:id="@+id/lblTitle"
+    <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:layout_marginLeft="15sp"
-        android:layout_marginTop="30sp"
-        android:layout_marginRight="15sp"
-        android:layout_marginBottom="15sp"
-        android:background="@drawable/borde"
-        android:gravity="center_vertical"
-        android:textAlignment="center"
-        android:textColor="@color/secondary"
-        android:textSize="24sp" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/lblCategory"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_margin="15sp"
-        android:background="@drawable/borde"
-        android:gravity="center_vertical"
-        android:textAlignment="center"
-        android:textColor="@color/secondary"
-        android:textSize="24sp" />
+        <ImageView
+            android:id="@+id/imgPost"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@tools:sample/avatars" />
 
-    <TextView
-        android:id="@+id/lblDescripcion"
-        android:layout_width="match_parent"
-        android:layout_height="135dp"
-        android:layout_margin="15sp"
-        android:background="@drawable/borde"
-        android:gravity="center_vertical"
-        android:textAlignment="center"
-        android:textColor="@color/secondary"
-        android:textSize="24sp" />
+        <TextView
+            android:id="@+id/lblTitle"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_marginLeft="15sp"
+            android:layout_marginTop="30sp"
+            android:layout_marginRight="15sp"
+            android:layout_marginBottom="15sp"
+            android:background="@drawable/borde"
+            android:gravity="center_vertical"
+            android:textAlignment="center"
+            android:textColor="@color/secondary"
+            android:textSize="24sp" />
 
-    <TextView
-        android:id="@+id/lblFecha"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_margin="15sp"
-        android:background="@drawable/borde"
-        android:gravity="center_vertical"
-        android:textAlignment="center"
-        android:textColor="@color/secondary"
-        android:textSize="24sp" />
+        <TextView
+            android:id="@+id/lblCategory"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_margin="15sp"
+            android:background="@drawable/borde"
+            android:gravity="center_vertical"
+            android:textAlignment="center"
+            android:textColor="@color/secondary"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/lblDescripcion"
+            android:layout_width="match_parent"
+            android:layout_height="135dp"
+            android:layout_margin="15sp"
+            android:background="@drawable/borde"
+            android:gravity="center_vertical"
+            android:textAlignment="center"
+            android:textColor="@color/secondary"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/lblFecha"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_margin="15sp"
+            android:background="@drawable/borde"
+            android:gravity="center_vertical"
+            android:textAlignment="center"
+            android:textColor="@color/secondary"
+            android:textSize="24sp" />
+
+    </LinearLayout>
 
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
 

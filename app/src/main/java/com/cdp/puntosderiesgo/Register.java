@@ -1,11 +1,5 @@
 package com.cdp.puntosderiesgo;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -23,43 +17,40 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
-import java.util.HashMap;
 import java.util.Random;
 
 public class Register extends AppCompatActivity {
 
     private EditText v_email;
     private EditText v_clave;
-    private TextView v_login;
     private FirebaseAuth mAuth;
     private ProgressDialog progressDialog;
-    private Button v_cargar_foto;
     private ImageView v_foto_perfil;
     private EditText v_username;
-    private static final int File=1;
     private StorageReference storageReference;
-    private String storage_path_post="User/*";
     private static final int COD_SEL_IMAGE=300;
-    private DatabaseReference RegisterMoment;
-    private String idLocal=idGenerator();
 
     private Uri image_url;
-    private String photo="photo";
     private Intent intent;
+
+    public Register() {
+    }
 
 
     @Override
@@ -70,9 +61,9 @@ public class Register extends AppCompatActivity {
         v_email= findViewById(R.id.txtregemail);
         v_clave= findViewById(R.id.txtregpassword);
         v_username=findViewById(R.id.txtregUsername);
-        v_login= findViewById(R.id.txtLogin);
+        TextView v_login = findViewById(R.id.txtLogin);
         v_foto_perfil=findViewById(R.id.imgregPerfil);
-        v_cargar_foto=findViewById(R.id.btnPerfilFoto);
+        Button v_cargar_foto = findViewById(R.id.btnPerfilFoto);
         intent=new Intent(Register.this,Login.class);
         progressDialog= new ProgressDialog(this);
         storageReference= FirebaseStorage.getInstance().getReference();
@@ -105,7 +96,6 @@ public class Register extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        FirebaseUser currentUser= mAuth.getCurrentUser();
     }
 
     private void cargarFoto() {
@@ -118,6 +108,7 @@ public class Register extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if(resultCode==RESULT_OK){
             if(requestCode==COD_SEL_IMAGE){
+                assert data != null;
                 image_url=data.getData();
                 subirPhoto(image_url);
             }
@@ -128,7 +119,9 @@ public class Register extends AppCompatActivity {
 
         progressDialog.setMessage("Actualizando Imagen");
         progressDialog.show();
-        String rute_storage_photo=storage_path_post+""+photo+""+mAuth.getUid()+""+idGenerator();//Es una id diferente
+        String storage_path_post = "User/*";
+        String photo = "photo";
+        String rute_storage_photo= storage_path_post +""+ photo +""+mAuth.getUid()+""+idGenerator();//Es una id diferente
         StorageReference reference=storageReference.child(rute_storage_photo);
         reference.putFile(image_url).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
@@ -143,7 +136,6 @@ public class Register extends AppCompatActivity {
                             Picasso.with(Register.this).load(download_uri)
                                     .fit()
                                     .into(v_foto_perfil);
-                            HashMap<String,Object> map=new HashMap<>();
                             intent.putExtra("userPhoto", download_uri);
                             progressDialog.dismiss();
                             Toast.makeText(Register.this,"Foto Actualizada",Toast.LENGTH_SHORT).show();
@@ -158,6 +150,10 @@ public class Register extends AppCompatActivity {
                 progressDialog.dismiss();
                 Toast.makeText(Register.this,"Error al subir Foto",Toast.LENGTH_SHORT).show();
             }
+        }).addOnFailureListener(e -> {
+            Log.d("TAG","Error al subir Foto", e);
+            progressDialog.dismiss();
+            Toast.makeText(Register.this,"Error al subir Foto",Toast.LENGTH_SHORT).show();
         });
 
     }
@@ -232,17 +228,17 @@ public class Register extends AppCompatActivity {
 
     public String idGenerator(){
         Random rnd = new Random();
-        String num ="";
+        StringBuilder num = new StringBuilder();
 
         for (int i = 0; i < 16; i++) {
             if (i < 8) { //Obtiene los primeros 8 numeros.
-                num += rnd.nextInt(8);
+                num.append(rnd.nextInt(8));
             } else {
                 //Obtiene caracter aleatorio entre 65 y 90 ("A" y "Z").
-                num += String.valueOf((char) (rnd.nextInt(90-65) + 65));
+                num.append((char) (rnd.nextInt(90 - 65) + 65));
             }
         }
-        return num;
+        return num.toString();
     }
 
 }

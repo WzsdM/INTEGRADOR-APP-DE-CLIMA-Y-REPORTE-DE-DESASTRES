@@ -30,11 +30,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Objects;
+
 public class Login extends AppCompatActivity {
 
     private EditText v_email;
     private EditText v_clave;
-    private TextView v_register;
     private FirebaseAuth mAuth;
     private ProgressDialog progressDialog;
 
@@ -45,7 +46,7 @@ public class Login extends AppCompatActivity {
 
         v_email= findViewById(R.id.txtemail);
         v_clave= findViewById(R.id.txtpassword);
-        v_register= findViewById(R.id.txtRegister);
+        TextView v_register = findViewById(R.id.txtRegister);
 
         SpannableString ss= new SpannableString(v_register.getText());
         ClickableSpan clickableSpan= new ClickableSpan() {
@@ -74,13 +75,13 @@ public class Login extends AppCompatActivity {
         String emailUser= getIntent().getStringExtra("email");
 
             if(username!=null&&idFotolocal!=null){
-                DatabaseReference comprobar = (DatabaseReference) FirebaseDatabase.getInstance().getReference()
+                DatabaseReference comprobar = FirebaseDatabase.getInstance().getReference()
                         .child("Usuarios");
 
                 comprobar.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.child(mAuth.getUid()).exists()) {
+                        if (snapshot.child(Objects.requireNonNull(mAuth.getUid())).exists()) {
                         }else{
                                 comprobar.child(mAuth.getUid()).child("username").setValue(username);
                                 comprobar.child(mAuth.getUid()).child("userPhoto").setValue(idFotolocal);
@@ -158,20 +159,9 @@ public class Login extends AppCompatActivity {
         }
     }
 
-    public void passtoRegister(View view){
-        Intent ns=new Intent(Login.this,Register.class);
-        startActivity(ns);
-    }
-
-    private void Delete(String uri){
-        FirebaseDatabase.getInstance().getReference()
-                .child("Register").child(uri).removeValue();
-    }
-
-
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(keyCode==event.KEYCODE_BACK){
+        if(keyCode== KeyEvent.KEYCODE_BACK){
             Intent intent=new Intent(Intent.ACTION_MAIN);
             intent.addCategory(Intent.CATEGORY_HOME);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

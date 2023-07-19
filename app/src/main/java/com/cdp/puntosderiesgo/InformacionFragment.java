@@ -1,5 +1,6 @@
 package com.cdp.puntosderiesgo;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.style.RelativeSizeSpan;
@@ -7,7 +8,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -91,6 +91,7 @@ public class InformacionFragment extends Fragment {
 
         //Request del método GET(lectura de datos)
         StringRequest postRequest=new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @SuppressLint("SetTextI18n")
             @Override
             //Capturamos la respuesta del GET en variables
             public void onResponse(String response) {
@@ -105,7 +106,7 @@ public class InformacionFragment extends Fragment {
                     JSONObject jsonObjectClouds=jsonObject.getJSONObject("clouds");
                     JSONObject jsonObjectSys=jsonObject.getJSONObject("sys");
 
-                    double id=jsonObjectWeather.getDouble("id");//Id de la consulta
+                    //Id de la consulta
                     String clima=jsonObjectWeather.getString("main");//Estado del clima actual
                     String description=jsonObjectWeather.getString("description");//Descripción del estado del clima actual
                     String icon=jsonObjectWeather.getString("icon");//Ícono representativo
@@ -127,7 +128,6 @@ public class InformacionFragment extends Fragment {
                     SpannableString ss1=  new SpannableString(temperatura);
                     ss1.setSpan(new RelativeSizeSpan(0.4f), 3,8, 0); // set size
                     String urlImg="http://openweathermap.org/img/wn/" + icon + "@2x.png";
-                    String urlPicasso="https://i.imgur.com/DvpvklR.png";
 
                     v_lugar.setText(cityName+"("+countryName+")");
                     v_temp.setText(ss1);

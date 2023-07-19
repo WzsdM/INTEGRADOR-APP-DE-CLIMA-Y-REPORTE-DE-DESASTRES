@@ -1,21 +1,12 @@
 package com.cdp.puntosderiesgo;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
-
-import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.SpannableString;
-import android.text.style.RelativeSizeSpan;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -24,6 +15,11 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -31,7 +27,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.cdp.puntosderiesgo.clases.Categoria;
-import com.cdp.puntosderiesgo.clases.Post;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -46,14 +41,13 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Random;
 
 public class CrearPostActivity extends AppCompatActivity {
@@ -62,7 +56,6 @@ public class CrearPostActivity extends AppCompatActivity {
     Spinner v_categoria;
     Button v_btn_imagen, v_anadir;
     ImageView v_suibr_imagen;
-    private static final int File=1;
     DatabaseReference myRef,spinnerRef;
     StorageReference storageReference;
     FirebaseAuth mAuth;
@@ -85,7 +78,7 @@ public class CrearPostActivity extends AppCompatActivity {
         mAuth=FirebaseAuth.getInstance();
         spinnerRef=FirebaseDatabase.getInstance().getReference().child("App");
         FirebaseDatabase database= FirebaseDatabase.getInstance();
-        myRef= database.getReference("Usuarios").child(mAuth.getCurrentUser()
+        myRef= database.getReference("Usuarios").child(Objects.requireNonNull(mAuth.getCurrentUser())
                 .getUid()).child("publicaciones").child(idGenerator());
         progressDialog= new ProgressDialog(this);
         storageReference=FirebaseStorage.getInstance().getReference();
@@ -117,7 +110,7 @@ public class CrearPostActivity extends AppCompatActivity {
                 if(snapshot.exists()){
                     categorias.clear();
                     for (DataSnapshot ds:snapshot.getChildren()){
-                        String nombre=ds.child("nombre").getValue().toString();
+                        String nombre= Objects.requireNonNull(ds.child("nombre").getValue()).toString();
                         categorias.add(new Categoria(nombre));
                     }
                     ArrayAdapter<Categoria> adapter;
@@ -144,6 +137,7 @@ public class CrearPostActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if(resultCode==RESULT_OK){
             if(requestCode==COD_SEL_IMAGE){
+                assert data != null;
                 image_url=data.getData();
                 subirPhoto(image_url);
             }
@@ -185,6 +179,10 @@ public class CrearPostActivity extends AppCompatActivity {
                 progressDialog.dismiss();
                 Toast.makeText(CrearPostActivity.this,"Error al subir Foto",Toast.LENGTH_SHORT).show();
             }
+        }).addOnFailureListener(e -> {
+            Log.d("TAG","Error al subir Foto", e);
+            progressDialog.dismiss();
+            Toast.makeText(CrearPostActivity.this,"Error al subir Foto",Toast.LENGTH_SHORT).show();
         });
 
     }
@@ -215,7 +213,7 @@ public class CrearPostActivity extends AppCompatActivity {
             String categoria = v_categoria.getSelectedItem().toString();
             final String[] pais = new String[1];
             final String[] ciudad = new String[1];
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+            @SuppressLint("SimpleDateFormat") SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
             String FechaHora = simpleDateFormat.format(new Date());
 
             HashMap<String, Object> map = new HashMap<>();
@@ -250,7 +248,7 @@ public class CrearPostActivity extends AppCompatActivity {
 
                         DatabaseReference refPost;
                         refPost = FirebaseDatabase.getInstance().getReference("Publicaciones").child(pais[0]).child(ciudad[0]);
-                        refPost.child(mAuth.getUid()).child(id).setValue("");
+                        refPost.child(Objects.requireNonNull(mAuth.getUid())).child(id).setValue("");
 
                     } catch (Exception e) {
                         Log.d("TAG", "Fallo GET Ciudad CrearPostActivity: " + e);
@@ -278,17 +276,17 @@ public class CrearPostActivity extends AppCompatActivity {
 
     public String idGenerator(){
         Random rnd = new Random();
-        String num ="";
+        StringBuilder num = new StringBuilder();
 
         for (int i = 0; i < 16; i++) {
             if (i < 8) { //Obtiene los primeros 8 numeros.
-                num += rnd.nextInt(8);
+                num.append(rnd.nextInt(8));
             } else {
                 //Obtiene caracter aleatorio entre 65 y 90 ("A" y "Z").
-                num += String.valueOf((char) (rnd.nextInt(90-65) + 65));
+                num.append((char) (rnd.nextInt(90 - 65) + 65));
             }
         }
-        return num;
+        return num.toString();
     }
 
     @Override

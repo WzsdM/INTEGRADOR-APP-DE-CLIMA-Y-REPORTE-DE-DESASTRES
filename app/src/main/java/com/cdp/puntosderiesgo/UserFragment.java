@@ -19,6 +19,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.util.Objects;
+
 public class UserFragment extends Fragment {
 
     ImageView v_cerrarSesion;
@@ -62,15 +64,15 @@ public class UserFragment extends Fragment {
 
     private void cargarDatos(View v){
         DatabaseReference getData= FirebaseDatabase.getInstance().getReference().child("Usuarios")
-                .child(mAuth.getUid());
+                .child(Objects.requireNonNull(mAuth.getUid()));
         getData.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
-                    v_Username.setText(snapshot.child("username").getValue().toString());
-                    v_email.setText(snapshot.child("email").getValue().toString());
+                    v_Username.setText(Objects.requireNonNull(snapshot.child("username").getValue()).toString());
+                    v_email.setText(Objects.requireNonNull(snapshot.child("email").getValue()).toString());
                     Picasso.with(v.getContext())
-                            .load(snapshot.child("userPhoto").getValue().toString())
+                            .load(Objects.requireNonNull(snapshot.child("userPhoto").getValue()).toString())
                             .into(profile);
                 }
             }
