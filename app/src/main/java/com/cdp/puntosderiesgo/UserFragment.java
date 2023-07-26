@@ -55,7 +55,7 @@ public class UserFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 mAuth.signOut();
-                startActivity(new Intent(view.getContext(),Login.class));
+                startActivity(new Intent(view.getContext().getApplicationContext(),Login.class));
                 requireActivity().finish();
             }
         });
@@ -71,7 +71,7 @@ public class UserFragment extends Fragment {
                 if(snapshot.exists()){
                     v_Username.setText(Objects.requireNonNull(snapshot.child("username").getValue()).toString());
                     v_email.setText(Objects.requireNonNull(snapshot.child("email").getValue()).toString());
-                    Picasso.with(v.getContext())
+                    Picasso.with(v.getContext().getApplicationContext())
                             .load(Objects.requireNonNull(snapshot.child("userPhoto").getValue()).toString())
                             .into(profile);
                 }

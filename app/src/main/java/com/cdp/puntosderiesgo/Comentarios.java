@@ -40,6 +40,9 @@ public class Comentarios extends AppCompatActivity {
     private ImageView v_profileMyuser;
     private RecyclerView recyclerView;
     private final List<ItemComentario> items= new ArrayList<>();
+    private myComentAdapter adapter;
+    private String usuario;
+    private String idpost;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +52,17 @@ public class Comentarios extends AppCompatActivity {
         mAuth=FirebaseAuth.getInstance();
         v_txtMyComment=findViewById(R.id.txtMyComment);
         v_profileMyuser=findViewById(R.id.profileMyuser);
+
+        usuario=getIntent().getStringExtra("usuario");
+        idpost=getIntent().getStringExtra("idpost");
+        recyclerView=findViewById(R.id.recyclerview);
+        LinearLayoutManager manager = new LinearLayoutManager(Comentarios.this);
+
+        recyclerView.hasPendingAdapterUpdates();
+        recyclerView.setHasFixedSize(true);
+        manager.setOrientation(LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(manager);
+        recyclerView.smoothScrollToPosition(0);
 
         DatabaseReference mUserProfile= FirebaseDatabase.getInstance().getReference().child("Usuarios")
                 .child(Objects.requireNonNull(mAuth.getUid()));
@@ -67,16 +81,6 @@ public class Comentarios extends AppCompatActivity {
 
                     }
                 });
-
-        String usuario=getIntent().getStringExtra("usuario");
-        String idpost=getIntent().getStringExtra("idpost");
-        recyclerView=findViewById(R.id.recyclerview);
-        recyclerView.setHasFixedSize(true);
-        LinearLayoutManager manager = new LinearLayoutManager(Comentarios.this);
-        manager.setOrientation(LinearLayoutManager.VERTICAL);
-        recyclerView.setLayoutManager(manager);
-        cargarComentarios(usuario,idpost);
-        recyclerView.smoothScrollToPosition(0);
 
         ImageView v_btnSend = findViewById(R.id.btnSend);
         v_btnSend.setOnClickListener(new View.OnClickListener() {
@@ -110,56 +114,59 @@ public class Comentarios extends AppCompatActivity {
             map.put("comentario",comentario);
             map.put("hora",hora);
             mRefPost.child(idcoment).updateChildren(map);
+            Toast.makeText(this, "Comentario escrito exitosamente", Toast.LENGTH_SHORT).show();
         }
 
     }
 
-    private void cargarComentarios(String usuario, String idpost){
-            mRefPost= FirebaseDatabase.getInstance().getReference().child("Usuarios")
-                    .child(usuario).child("publicaciones").child(idpost)
-                    .child("comentarios");
+    @Override
+    protected void onStart() {
+        mRefPost= FirebaseDatabase.getInstance().getReference().child("Usuarios")
+                .child(usuario).child("publicaciones").child(idpost)
+                .child("comentarios");
 
-            mRefPost.addValueEventListener(new ValueEventListener() {
-                @SuppressLint("NotifyDataSetChanged")
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(snapshot.exists()){
-                        items.clear();
-                        for (DataSnapshot comentario:snapshot.getChildren()){
-                            String usuario= String.valueOf(comentario.child("username").getValue());
-                            DatabaseReference mRefProfile= FirebaseDatabase.getInstance().getReference()
-                                    .child("Usuarios").child(usuario);
-                            mRefProfile.addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                    if(snapshot.exists()){
-                                        String username= String.valueOf(snapshot.child("username").getValue());
-                                        String imageProfile= String.valueOf(snapshot.child("userPhoto").getValue());
-                                        String coment= String.valueOf(comentario.child("comentario").getValue());
-                                        String hora= String.valueOf(comentario.child("hora").getValue());
-                                        items.add(new ItemComentario(imageProfile,username,hora,coment));
-                                    }
+        mRefPost.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    items.clear();
+                    for (DataSnapshot comentario:snapshot.getChildren()){
+                        String usuario= String.valueOf(comentario.child("username").getValue());
+                        DatabaseReference mRefProfile= FirebaseDatabase.getInstance().getReference()
+                                .child("Usuarios").child(usuario);
+                        mRefProfile.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if(snapshot.exists()){
+                                    String username= String.valueOf(snapshot.child("username").getValue());
+                                    String imageProfile= String.valueOf(snapshot.child("userPhoto").getValue());
+                                    String coment= String.valueOf(comentario.child("comentario").getValue());
+                                    String hora= String.valueOf(comentario.child("hora").getValue());
+                                    ItemComentario comentarionuevo= new ItemComentario(imageProfile,username,hora,coment);
+                                    items.add(comentarionuevo);
                                 }
+                            }
 
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError error) {
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
 
-                                }
-                            });
-                        }
-                        myComentAdapter adapter=new myComentAdapter(Comentarios.this,items);
-                        recyclerView.setAdapter(adapter);
-                        adapter.notifyDataSetChanged();
-
+                            }
+                        });
                     }
-                }
+                    adapter=new myComentAdapter(Comentarios.this,items);
+                    recyclerView.setAdapter(adapter);
+                    adapter.notifyDataSetChanged();
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                    Log.e("TAG","ERROR_CARGAR_COMENTARIOS : "+error);
-                    Toast.makeText(Comentarios.this,"Error al cargar Comentarios",Toast.LENGTH_SHORT).show();
                 }
-            });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("TAG","ERROR_CARGAR_COMENTARIOS : "+error);
+                Toast.makeText(Comentarios.this,"Error al cargar Comentarios",Toast.LENGTH_SHORT).show();
+            }
+        });
+        super.onStart();
     }
 
     public String idGenerator(){

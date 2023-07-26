@@ -8,9 +8,17 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
+
+import java.util.Objects;
 
 public class PostView extends AppCompatActivity {
 
@@ -26,6 +34,8 @@ public class PostView extends AppCompatActivity {
         TextView v_fecha = findViewById(R.id.lblFecha);
         ImageView v_imagen = findViewById(R.id.imgPost);
         ImageView v_btnComment = findViewById(R.id.btnComment);
+        ImageView v_imgAuthor = findViewById(R.id.imgAuthor);
+        TextView v_nameAuthor = findViewById(R.id.nameAuthor);
 
         String categoria=getIntent().getStringExtra("categoria");
         String fechaHora=getIntent().getStringExtra("fechaHora");
@@ -42,6 +52,27 @@ public class PostView extends AppCompatActivity {
         Picasso.with(this)
                 .load(photo)
                 .into(v_imagen);
+
+        DatabaseReference mUserProfile= FirebaseDatabase.getInstance().getReference().child("Usuarios")
+                .child(usuario);
+        mUserProfile.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()){
+                    String image_uri= String.valueOf(snapshot.child("userPhoto").getValue());
+                    String username= String.valueOf(snapshot.child("username").getValue());
+
+                    Picasso.with(PostView.this).load(image_uri)
+                            .into(v_imgAuthor);
+                    v_nameAuthor.setText(username);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
         v_btnComment.setOnClickListener(new View.OnClickListener() {
             @Override

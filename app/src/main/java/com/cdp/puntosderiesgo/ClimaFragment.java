@@ -58,6 +58,7 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 
 public class ClimaFragment extends Fragment implements OnMapReadyCallback {
 
@@ -65,6 +66,7 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
     private FusedLocationProviderClient fusedLocationClient;
     private ImageView climahoy;
     private TextView deschoy;
+    private View view;
 
     public ClimaFragment() {
         // Required empty public constructor
@@ -79,13 +81,14 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         //Creación de la vista
-        View view = inflater.inflate(R.layout.fragment_mapa, container, false);
+        view = inflater.inflate(R.layout.fragment_mapa, container, false);
 
         climahoy=view.findViewById(R.id.iconclimahoy);
         deschoy=view.findViewById(R.id.estadoclimahoy);
 
         //Valor de la locación actual del cliente
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(view.getContext());
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(view.getContext()
+                .getApplicationContext());
         //Conexión del fragmento del mapa Google
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         //Sincronizar mapa
@@ -101,8 +104,8 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
     public void onMapReady(@NonNull GoogleMap googleMap) {
 
         //Obtener última localización del dispositivo
-        if (ActivityCompat.checkSelfPermission(getView().getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getView().getContext(),
+        if (ActivityCompat.checkSelfPermission(view.getContext().getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(view.getContext().getApplicationContext(),
                 Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
@@ -151,7 +154,7 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
                                     String urlImg = "http://openweathermap.org/img/wn/" + icon + "@2x.png";
 
                                     deschoy.setText(description);
-                                    Picasso.with(getView().getContext())
+                                    Picasso.with(view.getContext().getApplicationContext())
                                             .load(urlImg)
                                             .into(climahoy);
                                     leerPost(googleMap, countryName, cityName);
@@ -182,7 +185,7 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
                         });
 
                         //enviar la petición
-                        RequestQueue requestQueue = Volley.newRequestQueue(getView().getContext());
+                        RequestQueue requestQueue = Volley.newRequestQueue(view.getContext().getApplicationContext());
                         requestQueue.add(postRequest);
                         //pasamos el bundle
                         getParentFragmentManager().setFragmentResult("requestKey", result);
@@ -195,7 +198,7 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
                                 .center(primeraUbicacion)
                                 .radius(500)
                                 .strokeColor(Color.TRANSPARENT)
-                                .fillColor(0x50ffd500));
+                                .fillColor(0x19A7CE00));
                         googleMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
                             @Override
                             public void onMyLocationChange(@NonNull Location location) {
@@ -219,7 +222,7 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
                                 boolean circleClicked = distance < radius;
 
                                 if (circleClicked) {
-                                    Intent ns = new Intent(getView().getContext(), CrearPostActivity.class);
+                                    Intent ns = new Intent(view.getContext().getApplicationContext(), CrearPostActivity.class);
                                     ns.putExtra("latitude", latitude);
                                     ns.putExtra("longitude", longitude);
                                     startActivity(ns);
@@ -256,26 +259,28 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 if (snapshot.exists()) {
-                                    for (DataSnapshot ignored : snapshot.getChildren()) {
+                                    for (DataSnapshot post : snapshot.getChildren()) {
+                                        String postid = idPost;
 
                                         refUsers.child(username).child("publicaciones")
                                                 .addValueEventListener(new ValueEventListener() {
                                                     @Override
                                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                                                         if(snapshot.exists()){
+                                                            if (Objects.equals(post.getKey(), postid)) {
 
-                                                            String categoria= String.valueOf(snapshot.child(idPost).child("categoria")
+                                                            String categoria= String.valueOf(snapshot.child(postid).child("categoria")
                                                                     .getValue());
-                                                            String fechaHora= String.valueOf(snapshot.child(idPost).child("fecha")
+                                                            String fechaHora= String.valueOf(snapshot.child(postid).child("fecha")
                                                                     .getValue());
-                                                            String title= String.valueOf(snapshot.child(idPost).child("title")
+                                                            String title= String.valueOf(snapshot.child(postid).child("title")
                                                                     .getValue());
-                                                            String photo= String.valueOf(snapshot.child(idPost).child("photo")
+                                                            String photo= String.valueOf(snapshot.child(postid).child("photo")
                                                                     .getValue());
-                                                            String detalle= String.valueOf(snapshot.child(idPost).child("detalle")
+                                                            String detalle= String.valueOf(snapshot.child(postid).child("detalle")
                                                                     .getValue());
 
-                                                            Intent intent=new Intent(getView().getContext(),PostView.class);
+                                                            Intent intent=new Intent(view.getContext().getApplicationContext(),PostView.class);
                                                             intent.putExtra("categoria",categoria);
                                                             intent.putExtra("fechaHora",fechaHora);
                                                             intent.putExtra("title",title);
@@ -284,8 +289,8 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
                                                             intent.putExtra("usuario",username);
                                                             intent.putExtra("idpost",idPost);
                                                             startActivity(intent);
+                                                            }
                                                         }
-
                                                     }
 
                                                     @Override

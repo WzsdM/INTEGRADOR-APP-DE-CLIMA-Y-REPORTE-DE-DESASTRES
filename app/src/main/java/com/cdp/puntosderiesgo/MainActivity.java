@@ -13,21 +13,24 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity{
+    private FragmentManager manager;
 
     //Crear clases de los fragmentos
-    ClimaFragment climaFragment= new ClimaFragment();
-    UserFragment userFragment= new UserFragment();
-    InformacionFragment informacionFragment= new InformacionFragment();
+    private ClimaFragment climaFragment= new ClimaFragment();
+    private UserFragment userFragment= new UserFragment();
+    private InformacionFragment informacionFragment= new InformacionFragment();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        manager = getSupportFragmentManager();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             AccessLocate();
@@ -102,9 +105,8 @@ public class MainActivity extends AppCompatActivity{
 
     //Método para reemplazar de un fragmento a otro
     public void loadFragment(Fragment fragment){
-        FragmentTransaction transaction= getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.frame_container, fragment);
-        transaction.commit();
-
+        FragmentTransaction fragmentTransaction = manager.beginTransaction();
+        fragmentTransaction.replace(R.id.frame_container, fragment);
+        fragmentTransaction.commit();
     }
 }

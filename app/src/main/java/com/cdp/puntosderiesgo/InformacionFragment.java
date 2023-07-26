@@ -137,7 +137,7 @@ public class InformacionFragment extends Fragment {
                     v_humedad.setText("Humedad : "+humidity+"g/m3");
                     v_sens.setText("Sensación Térmica: "+obtieneDosDecimales(temp_like)+" °C");
                     v_nubes.setText("Nubes : "+clouds+", Viento : "+wind+"km/h");
-                    Picasso.with(view.getContext()).load(urlImg)
+                    Picasso.with(view.getContext().getApplicationContext()).load(urlImg)
                             .fit()
                             .into(img);
 
@@ -156,7 +156,7 @@ public class InformacionFragment extends Fragment {
         });
 
         //enviar la petición
-        RequestQueue requestQueue = Volley.newRequestQueue(view.getContext());
+        RequestQueue requestQueue = Volley.newRequestQueue(view.getContext().getApplicationContext());
         requestQueue.add(postRequest);
     }
 
