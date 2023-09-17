@@ -49,6 +49,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.google.maps.android.SphericalUtil;
 import com.squareup.picasso.Picasso;
 
@@ -198,7 +200,7 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
                                 .center(primeraUbicacion)
                                 .radius(500)
                                 .strokeColor(Color.TRANSPARENT)
-                                .fillColor(0x19A7CE00));
+                                .fillColor(0x4DA7CE00));
                         googleMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
                             @Override
                             public void onMyLocationChange(@NonNull Location location) {
@@ -324,6 +326,9 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
         DatabaseReference refId= FirebaseDatabase.getInstance().getReference("Publicaciones")
                 .child(pais).child(ciudad);
         DatabaseReference refUsers=FirebaseDatabase.getInstance().getReference("Usuarios");
+
+        StorageReference refStorage= FirebaseStorage.getInstance().getReference();
+
         refId.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -346,22 +351,22 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
                                                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                                                     if(snapshot.exists()){
 
-                                                        assert postid != null;
-                                                        String categoria= String.valueOf(snapshot.child(postid).child("categoria")
-                                                                .getValue());
-                                                        String fechaHora= String.valueOf(snapshot.child(postid).child("fecha")
-                                                                .getValue());
-                                                        String title= String.valueOf(snapshot.child(postid).child("title")
-                                                                .getValue());
-                                                        double latitude= (double) snapshot.child(postid).child("latitude")
-                                                                .getValue();
-                                                        double longitude= (double) snapshot.child(postid).child("longitude")
-                                                                .getValue();
-
-                                                        @SuppressLint("SimpleDateFormat") SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-                                                        String fechaHoraActual = simpleDateFormat.format(new Date());
-
                                                         try {
+                                                            assert postid != null;
+                                                            String categoria= String.valueOf(snapshot.child(postid).child("categoria")
+                                                                    .getValue());
+                                                            String fechaHora= String.valueOf(snapshot.child(postid).child("fecha")
+                                                                    .getValue());
+                                                            String title= String.valueOf(snapshot.child(postid).child("title")
+                                                                    .getValue());
+                                                            double latitude= (double) snapshot.child(postid).child("latitude")
+                                                                    .getValue();
+                                                            double longitude= (double) snapshot.child(postid).child("longitude")
+                                                                    .getValue();
+
+                                                            @SuppressLint("SimpleDateFormat") SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+                                                            String fechaHoraActual = simpleDateFormat.format(new Date());
+
                                                             //Lo primero que tienes que hacer es establecer el formato que tiene tu fecha para que puedas obtener un objeto de tipo Date el cual es el que se utiliza para obtener la diferencia.
 
                                                             //Parceas tus fechas en string a variables de tipo date se agrega un try catch porque si el formato declarado anteriormente no es igual a tu fecha obtendrás una excepción
@@ -376,10 +381,30 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
                                                             //obtienes la diferencia en horas ya que la diferencia anterior está en milisegundos
                                                             difference = difference / (60 * 60 * 1000);
 
-                                                            if (difference >= 5 || difference <= -1) {//mayor o igual a 5 horas
+                                                            if (difference >= 3 || difference <= -1) {//mayor o igual a 3 horas
 
-                                                                refUsers.child(username).child("publicaciones").child(postid).removeValue();
-                                                                refId.child(username).child(postid).removeValue();
+                                                                refUsers.addValueEventListener(new ValueEventListener() {
+                                                                    @Override
+                                                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                                        String img_remove="";
+                                                                        if(snapshot.exists()){
+                                                                            img_remove= String.valueOf(snapshot.child(username).child("publicaciones").child(postid).child("photoName").getValue());
+                                                                            StorageReference imageRef=refStorage.child("Post/"+img_remove);
+                                                                            imageRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                                @Override
+                                                                                public void onSuccess(Void unused) {
+                                                                                    refUsers.child(username).child("publicaciones").child(postid).removeValue();
+                                                                                    refId.child(username).child(postid).removeValue();
+                                                                                }
+                                                                            });
+                                                                        }
+                                                                    }
+
+                                                                    @Override
+                                                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                                                    }
+                                                                });
 
                                                             } else {
                                                                 LatLng posMarker = new LatLng(latitude, longitude);
@@ -412,6 +437,29 @@ public class ClimaFragment extends Fragment implements OnMapReadyCallback {
 
                                                         } catch (Exception e) {
                                                             e.printStackTrace();
+
+                                                            refUsers.addValueEventListener(new ValueEventListener() {
+                                                                @Override
+                                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                                    String img_remove="";
+                                                                    if(snapshot.exists()){
+                                                                        img_remove= String.valueOf(snapshot.child(username).child("publicaciones").child(postid).child("photoName").getValue());
+                                                                        StorageReference imageRef=refStorage.child("Post/"+img_remove);
+                                                                        imageRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                            @Override
+                                                                            public void onSuccess(Void unused) {
+                                                                                refUsers.child(username).child("publicaciones").child(postid).removeValue();
+                                                                                refId.child(username).child(postid).removeValue();
+                                                                            }
+                                                                        });
+                                                                    }
+                                                                }
+
+                                                                @Override
+                                                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                                                }
+                                                            });
                                                         }
                                                     }
                                                 }

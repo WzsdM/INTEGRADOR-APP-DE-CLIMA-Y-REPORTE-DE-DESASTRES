@@ -59,7 +59,7 @@ public class CrearPostActivity extends AppCompatActivity {
     DatabaseReference myRef,spinnerRef;
     StorageReference storageReference;
     FirebaseAuth mAuth;
-    String storage_path_post="Post/*";
+    String storage_path_post="Post/";
     private static final int COD_SEL_IMAGE=300;
 
     private Uri image_url;
@@ -148,7 +148,8 @@ public class CrearPostActivity extends AppCompatActivity {
 
         progressDialog.setMessage("Actualizando Imagen");
         progressDialog.show();
-        String rute_storage_photo=storage_path_post+""+photo+""+mAuth.getUid()+""+idGenerator();//Es una id diferente
+        String Namephoto=photo+""+mAuth.getUid()+""+idGenerator();
+        String rute_storage_photo=storage_path_post+""+Namephoto;//Es una id diferente
         StorageReference reference=storageReference.child(rute_storage_photo);
         reference.putFile(image_url).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
@@ -165,6 +166,7 @@ public class CrearPostActivity extends AppCompatActivity {
                                     .into(v_suibr_imagen);
                             HashMap<String,Object> map=new HashMap<>();
                             map.put("photo",download_uri);
+                            map.put("photoName",Namephoto);
                             myRef.updateChildren(map);
                             progressDialog.dismiss();
                             Toast.makeText(CrearPostActivity.this,"Foto Actualizada",Toast.LENGTH_SHORT).show();
